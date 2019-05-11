@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    
-    <TextView
-        android:id="@+id/frag1TV"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/relLayProgress"
+    >
+
+    <ListView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" 
-        android:text="Appoinments ongoing"
-        android:layout_centerInParent="true"
-        android:textStyle="bold"/>
+        android:layout_height="wrap_content"
+        android:id="@+id/progressLV"
+        android:layout_margin="4dp"
+        android:divider="@drawable/list_item_divider"
+        android:dividerHeight="4dp"
+        >
+    </ListView>
 
 </RelativeLayout>
