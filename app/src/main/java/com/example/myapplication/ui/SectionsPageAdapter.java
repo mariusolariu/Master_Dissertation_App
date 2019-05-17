@@ -4,16 +4,17 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SectionsPageAdapter extends FragmentPagerAdapter{
+public class SectionsPageAdapter extends FragmentStatePagerAdapter {
 
   private final List<Fragment> fragmentList = new ArrayList<>();
   private final List<String> fragmentsTitles = new ArrayList<>();
 
-  public SectionsPageAdapter(FragmentManager fm) {
+  SectionsPageAdapter(FragmentManager fm) {
     super(fm);
   }
 
@@ -33,7 +34,7 @@ public class SectionsPageAdapter extends FragmentPagerAdapter{
     return fragmentsTitles.get(position);
   }
 
-  public void addFragment(Fragment fragment, String title){
+  void addFragment(Fragment fragment, String title){
     fragmentList.add(fragment);
     fragmentsTitles.add(title);
   }

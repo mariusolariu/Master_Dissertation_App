@@ -6,4 +6,14 @@
     <string name="reset_password_message">Reset password</string>
     <string name="sos_message">SOS</string>
     <string name="the_ymca_logo_mess">The YMCA Logo</string>
+    <string name="network_off_title">Internet is off!</string>
+    <string name="OK">OK</string>
+    <string name="close_app">Close App</string>
+    <string name="user_ic_desc">Standard icon for user</string>
+    <string name="right_icon_desc">Right icon</string>
+    <string name="location_ic_desc">Standard icon for location</string>
+    <string name="date_ic_desc">Standard icon for date</string>
+    <string name="mentee_code_hint">Mentee code</string>
+    <string name="location_hint">Location</string>
+    <string name="date_hint">Date</string>
 </resources>

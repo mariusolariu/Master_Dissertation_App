@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:columnCount="3"
+    android:rowCount="3">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:contentDescription="@string/user_ic_desc"
+        android:src="@drawable/mentee_icon" />
+
+    <TextView
+        android:id="@+id/menteeCodeTV"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="fill_horizontal|center"
+        android:hint="@string/mentee_code_hint" />
+
+    <ImageView
+        android:layout_width="48dp"
+        android:layout_height="90dp"
+        android:layout_rowSpan="3"
+        android:contentDescription="@string/right_icon_desc"
+        android:src="@drawable/right_sign_icon" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/location_ic_desc"
+        android:layout_margin="5dp"
+        android:src="@drawable/location_icon" />
+
+    <TextView
+        android:id="@+id/locationTV"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="fill_horizontal|center"
+        android:hint="@string/location_hint" />
+
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:contentDescription="@string/date_ic_desc"
+        android:src="@drawable/date_icon" />
+
+    <TextView
+        android:id="@+id/dateTV"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="fill_horizontal|center"
+        android:hint="@string/date_hint" />
+</GridLayout>
+
+

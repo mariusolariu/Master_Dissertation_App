@@ -19,11 +19,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.droidnet.DroidListener;
+import com.droidnet.DroidNet;
 import com.example.myapplication.R;
 import com.example.myapplication.model.MainActivityModel;
 import com.example.myapplication.model_firebase.Appointment;
 import com.example.myapplication.util.AppointmentState;
-import com.example.myapplication.util.InternetCheckTask;
+import com.example.myapplication.util.InternetConnectivityHelper;
 
 
 import java.util.ArrayList;
@@ -36,8 +38,8 @@ import java.util.List;
 //      * change the appointment date and see if they appear in the right section
 //      * provide feedback for an appointment and see if they are are moved to past appoinments
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, InternetCheckTask.InternetVisiter {
-    private static final String MAIN_TAG = "Marius";
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, DroidListener {
+    public static final String YMCA_TAG = "Ymca_Paisley";
 
     //ui
     private DrawerLayout drawerLayout;
@@ -49,15 +51,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private MainActivityModel maModel;
     private List<Fragment> fragments;
 
+    private boolean appWasntSetUp = true;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.nav_drawer);
 
-        //stop the execution until the internet is on
-        InternetCheckTask internetCheckTask = new InternetCheckTask(this);
-        internetCheckTask.execute();
+        //Library that helps to check the internet is always on when using the app
+        DroidNet.init(this);
+        DroidNet.getInstance().addInternetConnectivityListener(this);
+
+
+    }
+
+    public void setUpApp(){
+        maModel = ViewModelProviders.of(this).get(MainActivityModel.class);
+        //FIXME: to be modified later with the id of the logged user
+        maModel.init(1);
+
+
 
         Toolbar toolbar = findViewById(R.id.toolbar);
 
@@ -78,10 +92,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         TabLayout tabLay = findViewById(R.id.tabLayout);
         tabLay.setupWithViewPager(viewPager);
 
-        maModel = ViewModelProviders.of(this).get(MainActivityModel.class);
-        //FIXME: to be modified later with the id of the logged user
-        maModel.init(1);
-
         maModel.getAppointments().observe(this, new Observer<List<Appointment>>() {
             @Override
             public void onChanged(@Nullable List<Appointment> appointments) {
@@ -90,7 +100,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 int fragmentIndex = viewPager.getCurrentItem();
                 Fragment fragment = fragments.get(fragmentIndex);
 
-                ((AppointmentsListReceiver)fragment).onAppoinmentsListReceived(appointments);
+                ((AppointmentsListReceiver)fragment).onAppoinmentsListChanged(appointments);
+
+                //FIXME: filter the data and update the lists for each category, eventually move appointments from one category to another (this should be done by the model)
             }
         });
 
@@ -106,37 +118,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-
-
-        //FIXME modify it later and make sure that it complies with ViewModel a rchitecture
-        //FIXME check internet is on
-//        databaseReference = FirebaseDatabase.getInstance().getReference();
-//
-//
-//        DatabaseReference appointments = databaseReference.child("appointments").child("app1");
-//
-//        appointments.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//
-//
-//                if (dataSnapshot.exists()) {
-//                    Appointment a1 = dataSnapshot.getValue(Appointment.class);
-//                    Log.d(MAIN_TAG, a1.getM_code());
-//                    Log.d(MAIN_TAG, a1.getLocation());
-//                    Log.d(MAIN_TAG, a1.getDate());
-//                    Log.d(MAIN_TAG, a1.getTime());
-//
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-
-
+        appWasntSetUp = false;
     }
 
     @Override
@@ -182,12 +164,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         pastFragment.setArguments(b3);
         fragments.add(pastFragment);
 
-        fragments.add(new PastFragment());
-
         sectionsPageAdapter.addFragment(fragments.get(0), "Progress");
         sectionsPageAdapter.addFragment(fragments.get(1), "Upcoming");
         sectionsPageAdapter.addFragment(fragments.get(2), "Feedback");
         sectionsPageAdapter.addFragment(fragments.get(3), "Past");
+
+        viewPager.setOffscreenPageLimit(0);
 
         viewPager.setAdapter(sectionsPageAdapter);
     }
@@ -217,6 +199,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        DroidNet.getInstance().removeAllInternetConnectivityChangeListeners();
+    }
+
+    @Override
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
@@ -226,11 +214,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void internetResult(Boolean internetOn) {
-        if (internetOn){
-            Toast.makeText(this, "Internet is on", Toast.LENGTH_SHORT).show();
-        }else {
-            Toast.makeText(this, "Internet is off", Toast.LENGTH_SHORT).show();
+    public void onInternetConnectivityChanged(boolean isConnected) {
+        InternetConnectivityHelper icHelper = InternetConnectivityHelper.getInstance(this);
+
+        if (isConnected) {
+
+            if (icHelper.isDialogShowing()){
+//                Toast.makeText(this, "Dialog is showing", Toast.LENGTH_SHORT).show();
+                icHelper.dismissDialog();
+            }
+
+            if (appWasntSetUp){
+                setUpApp();
+            }
+
+        } else {
+
+            icHelper.showDialog();
         }
+
+    }
+
+    public List<Appointment> getAppointments(AppointmentState fragmentType){
+        //TODO: return the correct list according to the type of fragment and eventually move an appointment from the returned list to another (notice the model to do it - model responsability)
+        List<Appointment> appointments = null;
+
+        switch (fragmentType){
+            case PROGRESS:
+                appointments = maModel.getProgressAppts();
+                break;
+
+            case UPCOMING:
+                break;
+
+            case FEEDBACK:
+                break;
+
+            case PAST:
+                break;
+
+            default:
+                //returns an empty list
+                appointments = new ArrayList<>();
+
+        }
+
+        return appointments;
     }
 }

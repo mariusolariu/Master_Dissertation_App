@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,8 @@ import com.example.myapplication.util.AppointmentState;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.ContentValues.TAG;
+
 public class AppointmentsFragment extends Fragment implements AppointmentsListReceiver{
   private ProgressModel progressModel;
 
@@ -27,6 +30,11 @@ public class AppointmentsFragment extends Fragment implements AppointmentsListRe
   //FIXME to be modified later with custom adapter
   private ArrayAdapter<Appointment> appointmentsAdapter;
   private AppointmentState fragmentType;
+
+  public AppointmentsFragment(){
+    appointmentList = new ArrayList<>();
+
+  }
 
   /**
    * The system calls this when creating the fragment. Within your implementation, you should initialize essential components of the fragment that you want to retain when the fragment is paused or stopped, then resumed.
@@ -41,16 +49,12 @@ public class AppointmentsFragment extends Fragment implements AppointmentsListRe
     //FIXME to be fetched from login information later
     progressModel.init(1);
 
-    if (savedInstanceState != null) {
-      fragmentType = AppointmentState.valueOf(savedInstanceState.getString("type"));
+      Bundle passedBundle = getArguments();
+      if (passedBundle != null) {
+      fragmentType = AppointmentState.valueOf(passedBundle.getString("type"));
     }
+    appointmentsAdapter = new AppointmentAdapter(getActivity(), R.layout.appointment_item, appointmentList);
 
-//    progressModel.getProgressAppointments().observe(this, new Observer<List<Appointment>>() {
-//      @Override
-//      public void onChanged(@Nullable List<Appointment> appointments) {
-//        //Change/Update the UI of this fragment
-//      }
-//    });
   }
 
   @Nullable
@@ -60,14 +64,12 @@ public class AppointmentsFragment extends Fragment implements AppointmentsListRe
    */
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
+    Log.i(MainActivity.YMCA_TAG, "onCreateView called " + fragmentType);
+    View view = inflater.inflate(R.layout.fragment_layout, container, false);
 
-    View view = inflater.inflate(R.layout.frag_progress, container, false);
-
-    appointmentList = new ArrayList<>();
     progressAppsLV =  view.findViewById(R.id.progressLV);
-
-    appointmentsAdapter = new AppointmentAdapter(getActivity(), R.layout.appointment_item, appointmentList);
     progressAppsLV.setAdapter(appointmentsAdapter);
+
 
     return view;
   }
@@ -78,16 +80,39 @@ public class AppointmentsFragment extends Fragment implements AppointmentsListRe
 
   }
 
+  //Every time the fragments is resumed the list of appointments is update with what's currently in DB
+  @Override
+  public void onResume() {
+    super.onResume();
+    List<Appointment> upToDateAppointments = ((MainActivity) getActivity()).getAppointments(fragmentType);
+
+    if (upToDateAppointments != null) {
+      appointmentList.clear();
+      appointmentList.addAll(upToDateAppointments);
+      appointmentsAdapter.notifyDataSetChanged();
+    }
+
+    Log.i(MainActivity.YMCA_TAG, "onResume called for " + fragmentType);
+  }
+
   /**
    * The system calls this method as the first indication that the user is leaving the fragment (though it doesn't always mean the fragment is being destroyed). This is usually where you should commit any changes that should be persisted beyond the current user session (because the user might not come back)
    */
   @Override
   public void onPause() {
     super.onPause();
+    Log.i(MainActivity.YMCA_TAG, "onPause called for " + fragmentType);
+
   }
 
   @Override
-  public void onAppoinmentsListReceived(List<com.example.myapplication.model_firebase.Appointment> list) {
+  public void onStop() {
+    super.onStop();
+    Log.i(MainActivity.YMCA_TAG, "onStop called for " + fragmentType);
+  }
+
+  @Override
+  public void onAppoinmentsListChanged(List<com.example.myapplication.model_firebase.Appointment> list) {
     //notify the adapter that data has changed
     //depending on the fragmentType filter the data
 
