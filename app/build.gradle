@@ -32,6 +32,9 @@ dependencies {
 
     implementation 'com.google.firebase:firebase-core:16.0.9'
     implementation 'com.google.firebase:firebase-database:17.0.0'
+
+    implementation 'com.job:droidnet:2.0.0'
+
 }
 
 apply plugin: 'com.google.gms.google-services'
