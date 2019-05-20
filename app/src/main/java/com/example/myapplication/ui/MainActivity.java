@@ -53,6 +53,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private boolean appWasntSetUp = true;
 
+    private static final int PROGRESS_FRAG_INDEX = 0;
+    private static final int UPCOMING_FRAG_INDEX = 1;
+    private static final int FEEDBACK_FRAG_INDEX = 2;
+    private static final int PAST_FRAG_INDEX = 3;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,19 +97,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         TabLayout tabLay = findViewById(R.id.tabLayout);
         tabLay.setupWithViewPager(viewPager);
 
-        maModel.getAppointments().observe(this, new Observer<List<Appointment>>() {
-            @Override
-            public void onChanged(@Nullable List<Appointment> appointments) {
-                //send the new list to the active fragment
-
-                int fragmentIndex = viewPager.getCurrentItem();
-                Fragment fragment = fragments.get(fragmentIndex);
-
-                ((AppointmentsListReceiver)fragment).onAppoinmentsListChanged(appointments);
-
-                //FIXME: filter the data and update the lists for each category, eventually move appointments from one category to another (this should be done by the model)
-            }
-        });
+        addModelChangeDataListeners();
 
         addButton = findViewById(R.id.newAppointmentFB);
 
@@ -119,6 +112,62 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         appWasntSetUp = false;
+    }
+
+    private void addModelChangeDataListeners() {
+        maModel.getProgressAppts().observe(this, new Observer<List<Appointment>>() {
+            @Override
+            public void onChanged(@Nullable List<Appointment> appointments) {
+                //send the new list to the active fragment
+
+                Fragment fragment = fragments.get(PROGRESS_FRAG_INDEX);
+
+                if (fragment.isVisible()) {
+                    ((AppointmentsListReceiver) fragment).onAppoinmentsListChanged(appointments);
+                }
+
+                //FIXME: filter the data and update the lists for each category, eventually move appointments from one category to another (this should be done by the model)
+            }
+        });
+
+        maModel.getUpcomingAppts().observe(this, new Observer<List<Appointment>>() {
+            @Override
+            public void onChanged(@Nullable List<Appointment> appointments) {
+
+                Fragment fragment = fragments.get(UPCOMING_FRAG_INDEX);
+
+                if (fragment.isVisible()) {
+                    ((AppointmentsListReceiver) fragment).onAppoinmentsListChanged(appointments);
+                }
+
+            }
+        });
+
+        maModel.getFeedbackAppts().observe(this, new Observer<List<Appointment>>() {
+            @Override
+            public void onChanged(@Nullable List<Appointment> appointments) {
+
+                Fragment fragment = fragments.get(FEEDBACK_FRAG_INDEX);
+
+                if (fragment.isVisible()) {
+                    ((AppointmentsListReceiver) fragment).onAppoinmentsListChanged(appointments);
+                }
+
+            }
+        });
+
+        maModel.getPastAppts().observe(this, new Observer<List<Appointment>>() {
+            @Override
+            public void onChanged(@Nullable List<Appointment> appointments) {
+
+                Fragment fragment = fragments.get(PAST_FRAG_INDEX);
+
+                if (fragment.isVisible()) {
+                    ((AppointmentsListReceiver) fragment).onAppoinmentsListChanged(appointments);
+                }
+
+            }
+        });
     }
 
     @Override
@@ -164,10 +213,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         pastFragment.setArguments(b3);
         fragments.add(pastFragment);
 
-        sectionsPageAdapter.addFragment(fragments.get(0), "Progress");
-        sectionsPageAdapter.addFragment(fragments.get(1), "Upcoming");
-        sectionsPageAdapter.addFragment(fragments.get(2), "Feedback");
-        sectionsPageAdapter.addFragment(fragments.get(3), "Past");
+        sectionsPageAdapter.addFragment(fragments.get(PROGRESS_FRAG_INDEX), "Progress");
+        sectionsPageAdapter.addFragment(fragments.get(UPCOMING_FRAG_INDEX), "Upcoming");
+        sectionsPageAdapter.addFragment(fragments.get(FEEDBACK_FRAG_INDEX), "Feedback");
+        sectionsPageAdapter.addFragment(fragments.get(PAST_FRAG_INDEX), "Past");
 
         viewPager.setOffscreenPageLimit(0);
 
@@ -236,21 +285,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public List<Appointment> getAppointments(AppointmentState fragmentType){
-        //TODO: return the correct list according to the type of fragment and eventually move an appointment from the returned list to another (notice the model to do it - model responsability)
-        List<Appointment> appointments = null;
+        List<Appointment> appointments;
 
         switch (fragmentType){
             case PROGRESS:
-                appointments = maModel.getProgressAppts();
+                appointments = maModel.getProgressApptsList();
                 break;
 
             case UPCOMING:
+                appointments = maModel.getUpcomingApptsList();
                 break;
 
             case FEEDBACK:
+                appointments = maModel.getFeedbackApptsList();
                 break;
 
             case PAST:
+                appointments = maModel.getPastApptsList();
                 break;
 
             default:
