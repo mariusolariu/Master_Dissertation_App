@@ -12,4 +12,8 @@ public interface AppointmentsListener {
     void onFeedbackApptsChanged(List<Appointment> appointments);
 
     void onPastApptsChanged(List<Appointment> appointments);
+
+    void onUserInfoChanged(UserInfo userInfo);
+
+    void onManagerInfoChanged(ManagerInfo managerInfo);
 }

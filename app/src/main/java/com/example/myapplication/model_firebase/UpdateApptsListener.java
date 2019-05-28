@@ -19,21 +19,27 @@ import static com.example.myapplication.model_firebase.ConnectionFirebase.FEEDBA
 import static com.example.myapplication.model_firebase.ConnectionFirebase.PROGRESS_NODE;
 import static com.example.myapplication.model_firebase.ConnectionFirebase.UPCOMING_NODE;
 
+
+/**
+ * Listener used to move the appointments to the right category (e.g. from upcoming to progress) every time the app is opened
+ */
 public class UpdateApptsListener implements ValueEventListener {
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.UK);
     private DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
     private ConnectionFirebase owner;
+    private String userID;
 
-    UpdateApptsListener(ConnectionFirebase owner) {
+    UpdateApptsListener(ConnectionFirebase owner, String userId) {
         this.owner = owner;
+        this.userID = userId;
     }
 
     @Override
     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-        Iterable<DataSnapshot> upcomingAppts = dataSnapshot.child(UPCOMING_NODE).getChildren();
+        Iterable<DataSnapshot> upcomingAppts = dataSnapshot.child(userID).child(UPCOMING_NODE).getChildren();
         updateUpcomingAppts(upcomingAppts);
 
-        Iterable<DataSnapshot> progressSnapshots = dataSnapshot.child(PROGRESS_NODE).getChildren();
+        Iterable<DataSnapshot> progressSnapshots = dataSnapshot.child(userID).child(PROGRESS_NODE).getChildren();
         updateProgressAppts(progressSnapshots);
 
     }
@@ -54,22 +60,21 @@ public class UpdateApptsListener implements ValueEventListener {
 
         for (DataSnapshot upcomingApptSnapshot : dataSnapshots) {
             Appointment currentAppt = upcomingApptSnapshot.getValue(Appointment.class);
-            currentAppt.appointment_name = upcomingApptSnapshot.getKey();
+            String apptName = upcomingApptSnapshot.getKey();
 
             String stTime = (String) upcomingApptSnapshot.child("start_time").getValue();
             String endTime = (String) upcomingApptSnapshot.child("end_time").getValue();
             String date = (String) upcomingApptSnapshot.child("date").getValue();
 
-            long startTimeMillis = getTimeMillis(stTime, date);
-            long endTimeMillis = getTimeMillis(endTime, date);
+            long startTimeMillis = getTimeMillis(date, stTime);
+            long endTimeMillis = getTimeMillis(date, endTime);
 
             if ((startTimeMillis <= currentTime) &&
                     (currentTime <= endTimeMillis)) { //the current appoinment is due at the current time interval
-                //FIXME: Once a category remains without children it is deleted. Make sure that adding to that category is still possible (e.g. is created if it doesn't exist)
-                moveAppointment(UPCOMING_NODE, PROGRESS_NODE, currentAppt);
+                moveAppointment(UPCOMING_NODE, PROGRESS_NODE, currentAppt, apptName);
 
             } else if (endTimeMillis < currentTime) { //the current appointment should have been done by the current time
-                moveAppointment(UPCOMING_NODE, FEEDBACK_NODE, currentAppt);
+                moveAppointment(UPCOMING_NODE, FEEDBACK_NODE, currentAppt, apptName);
             }
 
         }
@@ -87,12 +92,12 @@ public class UpdateApptsListener implements ValueEventListener {
 
         for (DataSnapshot progressSnapshot : progressSnapshots) {
             Appointment currentAppt = progressSnapshot.getValue(Appointment.class);
-            currentAppt.appointment_name = progressSnapshot.getKey();
+            String apptName = progressSnapshot.getKey();
 
-            long endTimeMillis = getTimeMillis(currentAppt.getEnd_time(), currentAppt.getDate());
+            long endTimeMillis = getTimeMillis(currentAppt.getDate(), currentAppt.getEnd_time());
 
             if (endTimeMillis < currentTimeMillis) {
-                moveAppointment(PROGRESS_NODE, FEEDBACK_NODE, currentAppt);
+                moveAppointment(PROGRESS_NODE, FEEDBACK_NODE, currentAppt, apptName);
             }
 
         }
@@ -101,15 +106,16 @@ public class UpdateApptsListener implements ValueEventListener {
         owner.addListenersForCategories();
     }
 
-    private void moveAppointment(String sourceCategory, String destinationCategory, Appointment a) {
+    private void moveAppointment(String sourceCategory, String destinationCategory, Appointment a, String apptName) {
         //delete
-        databaseReference.child(sourceCategory).child(a.appointment_name).setValue(null);
+        databaseReference.child(userID).child(sourceCategory).child(apptName).setValue(null);
 
         //add
-        databaseReference.child(destinationCategory).push().setValue(a);
+        //FIXME: introduces an extra field in under the appointment entry in DB, namely appt name
+        databaseReference.child(userID).child(destinationCategory).push().setValue(a);
     }
 
-    private long getTimeMillis(String time, String date) {
+    private long getTimeMillis(String date, String time) {
         Date d1;
         long result = 0;
 

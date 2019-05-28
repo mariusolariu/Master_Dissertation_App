@@ -19,7 +19,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="fill_horizontal|center"
-        android:hint="@string/mentee_code_hint" />
+        android:hint="@string/mcode_text" />
 
     <ImageView
         android:layout_width="48dp"
@@ -40,7 +40,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="fill_horizontal|center"
-        android:hint="@string/location_hint" />
+        android:hint="@string/location_text" />
 
 
     <ImageView
@@ -55,7 +55,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="fill_horizontal|center"
-        android:hint="@string/date_hint" />
+        android:hint="@string/date_text" />
 </GridLayout>
 
 

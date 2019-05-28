@@ -1,20 +1,17 @@
 package com.example.myapplication.model_firebase;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.example.myapplication.model.AppointmentsListener;
-import com.example.myapplication.ui.MainActivity;
+import com.example.myapplication.model.ManagerInfo;
+import com.example.myapplication.model.UserInfo;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -22,21 +19,25 @@ import java.util.List;
 public class ConnectionFirebase {
     private DatabaseReference databaseReference;
     private AppointmentsListener listener;
+    private String userId;
 
-    public static final String PROGRESS_NODE = "progressAppts";
-    public static final String UPCOMING_NODE = "upcomingAppts";
-    public static final String FEEDBACK_NODE = "feedbackAppts";
-    public static final String PAST_NODE = "pastAppts";
+    static final String PROGRESS_NODE = "progressAppts";
+    static final String UPCOMING_NODE = "upcomingAppts";
+    static final String FEEDBACK_NODE = "feedbackAppts";
+    static final String PAST_NODE = "pastAppts";
+    static final String USER_NODE = "userInfo";
+    static final String MANAGER_NODE = "managerInfo";
 
-    public ConnectionFirebase(AppointmentsListener listener) {
+    public ConnectionFirebase(AppointmentsListener listener, String userId) {
         databaseReference = FirebaseDatabase.getInstance().getReference();
         this.listener = listener;
+        this.userId = userId;
 
         updateAppointmentsDb();
     }
 
     void addListenersForCategories() {
-        databaseReference.child(PROGRESS_NODE).addValueEventListener(new ValueEventListener() {
+        databaseReference.child(userId).child(PROGRESS_NODE).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -61,7 +62,7 @@ public class ConnectionFirebase {
             }
         });
 
-        databaseReference.child(UPCOMING_NODE).addValueEventListener(new ValueEventListener() {
+        databaseReference.child(userId).child(UPCOMING_NODE).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -86,7 +87,7 @@ public class ConnectionFirebase {
             }
         });
 
-        databaseReference.child(FEEDBACK_NODE).addValueEventListener(new ValueEventListener() {
+        databaseReference.child(userId).child(FEEDBACK_NODE).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -111,7 +112,7 @@ public class ConnectionFirebase {
             }
         });
 
-        databaseReference.child(PAST_NODE).addValueEventListener(new ValueEventListener() {
+        databaseReference.child(userId).child(PAST_NODE).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -124,7 +125,6 @@ public class ConnectionFirebase {
                     while (iterator.hasNext()) {
                         DataSnapshot data = (DataSnapshot) iterator.next();
                         Appointment appointment = data.getValue(Appointment.class);
-                        appointment.appointment_name = data.getKey();
                         appointments.add(appointment);
                     }
 
@@ -137,6 +137,35 @@ public class ConnectionFirebase {
 
             }
         });
+
+        databaseReference.child(userId).child(USER_NODE).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                UserInfo userInfo = dataSnapshot.getValue(UserInfo.class);
+
+                listener.onUserInfoChanged(userInfo);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        databaseReference.child(MANAGER_NODE).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                ManagerInfo managerInfo = dataSnapshot.getValue(ManagerInfo.class);
+
+                listener.onManagerInfoChanged(managerInfo);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     /**
@@ -145,8 +174,13 @@ public class ConnectionFirebase {
      * -> move from progress to feedback appointments which are done
      */
     private void updateAppointmentsDb() {
-        databaseReference.addListenerForSingleValueEvent(new UpdateApptsListener(this));
+        databaseReference.child(userId).addListenerForSingleValueEvent(new UpdateApptsListener(this, userId));
 
+    }
+
+    public void addAppointment(Appointment appt) {
+        //TODO: maybe decide if it needs to be put in Progress appts or Upcoming appts based on when is scheduled to take place
+        databaseReference.child(userId).child(UPCOMING_NODE).push().setValue(appt);
     }
 
 

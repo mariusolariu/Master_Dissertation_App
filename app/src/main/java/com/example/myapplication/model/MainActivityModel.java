@@ -14,25 +14,34 @@ public class MainActivityModel extends ViewModel implements AppointmentsListener
     private MutableLiveData<List<Appointment>> upcomingAppts;
     private MutableLiveData<List<Appointment>> feedbackAppts;
     private MutableLiveData<List<Appointment>> pastAppts;
+    private MutableLiveData<UserInfo> userInfoLD;
+    private MutableLiveData<ManagerInfo> managerInfoLD;
 
-    private ConnectionFirebase firebaseDatabase;
+
+    private ConnectionFirebase connectionFirebase;
+    private String userId;
 
 
-    private int userId;
-
-    public void init(int userId) {
+    public void init(String userId) {
         this.userId = userId;
 
-        if (progressAppts == null) {
-            progressAppts = new MutableLiveData<>();
-            upcomingAppts = new MutableLiveData<>();
-            feedbackAppts = new MutableLiveData<>();
-            pastAppts = new MutableLiveData<>();
+        progressAppts = new MutableLiveData<>();
+        upcomingAppts = new MutableLiveData<>();
+        feedbackAppts = new MutableLiveData<>();
+        pastAppts = new MutableLiveData<>();
+        userInfoLD = new MutableLiveData<>();
+        managerInfoLD = new MutableLiveData<>();
 
-            firebaseDatabase = new ConnectionFirebase(this);
-        }
+        connectionFirebase = new ConnectionFirebase(this, userId);
     }
 
+    public MutableLiveData<ManagerInfo> getManagerInfoLD() {
+        return managerInfoLD;
+    }
+
+    public MutableLiveData<UserInfo> getUserInfoLD() {
+        return userInfoLD;
+    }
     public LiveData<List<Appointment>> getProgressAppts() {
         return progressAppts;
     }
@@ -92,9 +101,19 @@ public class MainActivityModel extends ViewModel implements AppointmentsListener
         this.pastAppts.setValue(appointments);
     }
 
+    @Override
+    public void onUserInfoChanged(UserInfo userInfo) {
+        this.userInfoLD.setValue(userInfo);
+    }
+
+    @Override
+    public void onManagerInfoChanged(ManagerInfo managerInfo) {
+        this.managerInfoLD.setValue(managerInfo);
+    }
+
     //interract with Firebase to add new appointment
     public void addAppointment(Appointment newA) {
-
+        connectionFirebase.addAppointment(newA);
     }
 
     //interract with Firebase to remove appointment

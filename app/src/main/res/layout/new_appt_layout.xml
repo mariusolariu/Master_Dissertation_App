@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:columnCount="3"
+        android:rowCount="6"
+
+        >
+
+        <ImageView
+
+            android:layout_margin="5dp"
+            android:contentDescription="@string/user_ic_desc"
+            android:src="@drawable/mentee_icon" />
+
+        <TextView
+
+            android:layout_marginTop="10dp"
+            android:text="@string/mcode_text" />
+
+        <EditText
+            android:id="@+id/mcodeET"
+            android:layout_gravity="fill"
+            android:layout_margin="5dp"
+            android:hint="@string/m_code_hint"
+            android:inputType="text"
+            android:maxLines="1"
+            android:textSize="13sp" />
+
+        <ImageView
+            android:layout_margin="5dp"
+            android:contentDescription="@string/location_ic_desc"
+            android:src="@drawable/location_icon" />
+
+        <TextView
+            android:layout_marginTop="10dp"
+            android:text="@string/location_text" />
+
+        <EditText
+            android:id="@+id/locationET"
+            android:layout_gravity="fill"
+            android:layout_margin="5dp"
+            android:hint="@string/location_hint"
+            android:inputType="text"
+            android:maxLines="1"
+            android:textSize="13sp" />
+
+        <ImageView
+            android:layout_row="0"
+            android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:contentDescription="@string/time_location_icon_cd"
+            android:src="@drawable/time_icon" />
+
+        <TextView
+            android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:text="@string/start_time_message" />
+
+        <include layout="@layout/time_picker_layout" />
+
+        <ImageView
+            android:layout_row="0"
+            android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:contentDescription="@string/time_location_icon_cd"
+            android:src="@drawable/time_icon" />
+
+        <TextView
+            android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:text="@string/end_time_message" />
+
+        <include layout="@layout/time_picker_layout_end_time" />
+
+        <ImageView
+            android:layout_row="0"
+            android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:contentDescription="@string/date_ic_desc"
+            android:src="@drawable/date_icon" />
+
+        <TextView
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:text="@string/date_message"
+            android:textSize="15sp" />
+
+        <EditText
+            android:id="@+id/pickDateET"
+            android:layout_gravity="fill"
+            android:hint="@string/pick_date_hint" />
+
+        <Button
+            android:id="@+id/saveBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="3"
+            android:background="@color/greenSave"
+            android:text="@string/save_btn_text"
+            android:textAllCaps="false" />
+
+    </GridLayout>
+
+
+</ScrollView>

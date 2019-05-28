@@ -13,7 +13,23 @@
     <string name="right_icon_desc">Right icon</string>
     <string name="location_ic_desc">Standard icon for location</string>
     <string name="date_ic_desc">Standard icon for date</string>
-    <string name="mentee_code_hint">Mentee code</string>
-    <string name="location_hint">Location</string>
-    <string name="date_hint">Date</string>
+    <string name="mcode_text">Mentee code</string>
+    <string name="date_text">Date</string>
+    <string name="new_appt_activ_name">New appointment</string>
+    <string name="m_code_hint">abc345</string>
+    <string name="start_time_message">Start time</string>
+    <string name="end_time_message">End Time</string>
+    <string name="date_message">Date</string>
+    <string name="pick_date_hint">19/10/2019</string>
+    <string name="title_activity_login">Sign in</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="location_hint">12 Byres Road, Glasgow</string>
+    <string name="location_text">Location</string>
+    <string name="time_location_icon_cd">Time location icon</string>
+    <string name="save_btn_text">Save</string>
+    <string name="forename_surname_text">Forename Surname</string>
+    <string name="header_email_text">username@ymca.com</string>
 </resources>
