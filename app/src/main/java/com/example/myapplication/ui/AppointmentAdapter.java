@@ -9,16 +9,17 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.example.myapplication.R;
-import com.example.myapplication.model_firebase.Appointment;
+import com.example.myapplication.model.Appointment;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class AppointmentAdapter extends ArrayAdapter<Appointment> {
-    private Context context;
-    private List<Appointment> appointments;
-    private int layoutResId;
+class AppointmentAdapter extends ArrayAdapter<Appointment> {
+    private final Context context;
+    private final List<Appointment> appointments;
+    private final int layoutResId;
+
 
     AppointmentAdapter(Context context, int resource, List<Appointment> objects) {
         super(context, resource, objects);

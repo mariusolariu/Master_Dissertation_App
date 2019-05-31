@@ -8,6 +8,7 @@
     <string name="the_ymca_logo_mess">The YMCA Logo</string>
     <string name="network_off_title">Internet is off!</string>
     <string name="OK">OK</string>
+    <string name="Cancel">Cancel</string>
     <string name="close_app">Close App</string>
     <string name="user_ic_desc">Standard icon for user</string>
     <string name="right_icon_desc">Right icon</string>
@@ -32,4 +33,16 @@
     <string name="save_btn_text">Save</string>
     <string name="forename_surname_text">Forename Surname</string>
     <string name="header_email_text">username@ymca.com</string>
+    <string name="edit_appointment_butt_text">Edit appointment button</string>
+    <string name="reason_for_not_completing_appt">Reason for not completing appt</string>
+    <string name="title_reason_dialog">Provide reason for canceling!</string>
+    <string name="feedback_activ">Provide Feedback</string>
+    <string name="reason_cancelling_appt">It was raining…</string>
+    <string name="q1">How was the atmosphere in the home/with the family?</string>
+    <string name="q2">How did the activity go?</string>
+    <string name="q3">How do you feel the young person is progressing?</string>
+    <string name="q4">Is there anything that the young person feels they need to improve on?</string>
+    <string name="q5">Any other comments?</string>
+    <string name="answer_question">Answer this question...</string>
+    <string name="edit_appt">Edit Appointment</string>
 </resources>

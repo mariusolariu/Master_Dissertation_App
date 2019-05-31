@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,7 +16,7 @@ import android.widget.Toast;
 import com.droidnet.DroidListener;
 import com.droidnet.DroidNet;
 import com.example.myapplication.R;
-import com.example.myapplication.model_firebase.Appointment;
+import com.example.myapplication.model.Appointment;
 
 import java.util.Calendar;
 
@@ -35,7 +36,6 @@ public class NewAppointmentActivity extends AppCompatActivity implements DroidLi
     private TimePicker endTimePicker;
     private Button saveBtn;
 
-    private Calendar calendar;
     private DatePickerFragment pickerDialog;
 
     private boolean activityNotSetUp = true;
@@ -60,16 +60,54 @@ public class NewAppointmentActivity extends AppCompatActivity implements DroidLi
         endTimePicker.setIs24HourView(true);
 
         dateET = findViewById(R.id.pickDateET);
-        calendar = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance();
         String currentDateText = formatDate(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
         dateET.setText(currentDateText);
         dateET.setInputType(InputType.TYPE_NULL);
 
         pickerDialog = new DatePickerFragment();
 
+        Intent passedIntent = getIntent();
+
+        Appointment appointment;
+
+        //it means that the activity was opened to edit an existing appt
+        Bundle extras = passedIntent.getExtras();
+        if (extras != null) {
+            appointment = extras.getParcelable(MainActivity.EDIT_APPOINTMENT);
+            fillInFields(appointment);
+        }
+
         addListeners();
 
         activityNotSetUp = false;
+    }
+
+    private void fillInFields(Appointment appointment) {
+        mcodeET.setText(appointment.getM_code());
+        locationET.setText(appointment.getLocation());
+
+        int[] startTime = getHourAndMinute(appointment.getStart_time());
+        startTimePicker.setCurrentHour(startTime[0]);
+        startTimePicker.setCurrentMinute(startTime[1]);
+
+        int[] endTime = getHourAndMinute(appointment.getEnd_time());
+        endTimePicker.setCurrentHour(endTime[0]);
+        endTimePicker.setCurrentMinute(endTime[1]);
+
+        dateET.setText(appointment.getDate());
+    }
+
+    private int[] getHourAndMinute(String textTime) {
+        int[] result = new int[2];
+        String hourString = textTime.substring(0, 2);
+
+        result[0] = Integer.valueOf(hourString);
+
+        String minuteString = textTime.substring(3, 5);
+        result[1] = Integer.valueOf(minuteString);
+
+        return result;
     }
 
     private void addListeners() {
@@ -102,7 +140,9 @@ public class NewAppointmentActivity extends AppCompatActivity implements DroidLi
 
                 String date = dateET.getText().toString();
                 String feedbackProvided = "no";
-                Appointment newAppt = new Appointment(location, menteeCode, date, start_time, end_time, feedbackProvided);
+
+                //TODO might need to modifiy it at a later time
+                Appointment newAppt = new Appointment("", location, menteeCode, date, start_time, end_time, feedbackProvided);
 
                 Intent intent = new Intent();
                 intent.putExtra(NEW_APPOINTMENT_TAG, newAppt);
@@ -144,12 +184,12 @@ public class NewAppointmentActivity extends AppCompatActivity implements DroidLi
     private String formatDate(int day, int month, int year) {
         StringBuilder date = new StringBuilder();
 
-        String theDay = (day >= 1 && day <= 9) ? "0" + String.valueOf(day) : String.valueOf(day);
+        String theDay = (day >= 1 && day <= 9) ? "0" + day : String.valueOf(day);
         date.append(theDay);
         date.append("/");
 
         month++;
-        String theMonth = (month >= 1 && month <= 9) ? "0" + String.valueOf(month) : String.valueOf(month);
+        String theMonth = (month >= 1 && month <= 9) ? "0" + month : String.valueOf(month);
         date.append(theMonth);
 
         date.append("/");
@@ -175,8 +215,18 @@ public class NewAppointmentActivity extends AppCompatActivity implements DroidLi
                 setUp();
             }
         } else {
-            Toast.makeText(this, "Turn on the Interent!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Turn on the Internet!", Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            setResult(RESULT_CANCELED);
+            finish();
+        }
+
+        return true;
     }
 }

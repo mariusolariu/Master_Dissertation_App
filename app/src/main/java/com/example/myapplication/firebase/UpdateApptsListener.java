@@ -1,8 +1,9 @@
-package com.example.myapplication.model_firebase;
+package com.example.myapplication.firebase;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.example.myapplication.model.Appointment;
 import com.example.myapplication.ui.MainActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -15,19 +16,19 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import static com.example.myapplication.model_firebase.ConnectionFirebase.FEEDBACK_NODE;
-import static com.example.myapplication.model_firebase.ConnectionFirebase.PROGRESS_NODE;
-import static com.example.myapplication.model_firebase.ConnectionFirebase.UPCOMING_NODE;
+import static com.example.myapplication.firebase.ConnectionFirebase.FEEDBACK_NODE;
+import static com.example.myapplication.firebase.ConnectionFirebase.PROGRESS_NODE;
+import static com.example.myapplication.firebase.ConnectionFirebase.UPCOMING_NODE;
 
 
 /**
  * Listener used to move the appointments to the right category (e.g. from upcoming to progress) every time the app is opened
  */
 public class UpdateApptsListener implements ValueEventListener {
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.UK);
-    private DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-    private ConnectionFirebase owner;
-    private String userID;
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.UK);
+    private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+    private final ConnectionFirebase owner;
+    private final String userID;
 
     UpdateApptsListener(ConnectionFirebase owner, String userId) {
         this.owner = owner;
@@ -60,7 +61,7 @@ public class UpdateApptsListener implements ValueEventListener {
 
         for (DataSnapshot upcomingApptSnapshot : dataSnapshots) {
             Appointment currentAppt = upcomingApptSnapshot.getValue(Appointment.class);
-            String apptName = upcomingApptSnapshot.getKey();
+            currentAppt.setApptKey(upcomingApptSnapshot.getKey());
 
             String stTime = (String) upcomingApptSnapshot.child("start_time").getValue();
             String endTime = (String) upcomingApptSnapshot.child("end_time").getValue();
@@ -71,10 +72,10 @@ public class UpdateApptsListener implements ValueEventListener {
 
             if ((startTimeMillis <= currentTime) &&
                     (currentTime <= endTimeMillis)) { //the current appoinment is due at the current time interval
-                moveAppointment(UPCOMING_NODE, PROGRESS_NODE, currentAppt, apptName);
+                FirebaseHelper.moveAppointment(databaseReference, userID, UPCOMING_NODE, PROGRESS_NODE, currentAppt);
 
             } else if (endTimeMillis < currentTime) { //the current appointment should have been done by the current time
-                moveAppointment(UPCOMING_NODE, FEEDBACK_NODE, currentAppt, apptName);
+                FirebaseHelper.moveAppointment(databaseReference, userID, UPCOMING_NODE, FEEDBACK_NODE, currentAppt);
             }
 
         }
@@ -92,12 +93,12 @@ public class UpdateApptsListener implements ValueEventListener {
 
         for (DataSnapshot progressSnapshot : progressSnapshots) {
             Appointment currentAppt = progressSnapshot.getValue(Appointment.class);
-            String apptName = progressSnapshot.getKey();
+            currentAppt.setApptKey(progressSnapshot.getKey());
 
             long endTimeMillis = getTimeMillis(currentAppt.getDate(), currentAppt.getEnd_time());
 
             if (endTimeMillis < currentTimeMillis) {
-                moveAppointment(PROGRESS_NODE, FEEDBACK_NODE, currentAppt, apptName);
+                FirebaseHelper.moveAppointment(databaseReference, userID, PROGRESS_NODE, FEEDBACK_NODE, currentAppt);
             }
 
         }
@@ -106,14 +107,7 @@ public class UpdateApptsListener implements ValueEventListener {
         owner.addListenersForCategories();
     }
 
-    private void moveAppointment(String sourceCategory, String destinationCategory, Appointment a, String apptName) {
-        //delete
-        databaseReference.child(userID).child(sourceCategory).child(apptName).setValue(null);
 
-        //add
-        //FIXME: introduces an extra field in under the appointment entry in DB, namely appt name
-        databaseReference.child(userID).child(destinationCategory).push().setValue(a);
-    }
 
     private long getTimeMillis(String date, String time) {
         Date d1;

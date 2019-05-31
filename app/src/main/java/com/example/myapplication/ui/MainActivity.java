@@ -3,6 +3,7 @@ package com.example.myapplication.ui;
 import android.Manifest;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -19,13 +20,17 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,10 +38,10 @@ import android.widget.Toast;
 import com.droidnet.DroidListener;
 import com.droidnet.DroidNet;
 import com.example.myapplication.R;
+import com.example.myapplication.model.Appointment;
 import com.example.myapplication.model.MainActivityModel;
 import com.example.myapplication.model.ManagerInfo;
 import com.example.myapplication.model.UserInfo;
-import com.example.myapplication.model_firebase.Appointment;
 import com.example.myapplication.util.AppointmentState;
 import com.example.myapplication.util.InternetConnectivityHelper;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -57,29 +62,34 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, DroidListener {
     public static final String YMCA_TAG = "Ymca_Paisley";
-    public static final int NEW_APPT_CODE = 100;
-    public static final int REQ_SIGN_IN = 101;
-    public static final int REQ_SMS_PERMISSION = 102;
+    private static final int NEW_APPT_CODE = 100;
+    static final int REQ_SIGN_IN = 101;
+    private static final int REQ_SMS_PERMISSION = 102;
+    private static final int EDIT_APPT_CODE = 103;
+    static final int PROVID_FDBK_CODE = 104;
+    final static String EDIT_APPOINTMENT = "EDIT_APPOINTMENT";
+    final static String ANSWERS_ARRAY_CODE = "ANSWERS_ARRAY_CODE";
 
     //ui
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
-    private NavigationView navigationView;
-    private ViewPager viewPager;
     private FloatingActionButton addApptBtn;
     private ProgressBar loginPB;
     private TextView userNameTV;
     private TextView userEmailTV;
     private View headerLayout;
+    private AlertDialog reasonAlertDialog;
 
     private MainActivityModel maModel;
     private List<Fragment> fragments;
 
-    private boolean appWasntSetUp = true;
     private boolean smsPermissionGranted;
     //updated whenever the user of the app is modified;
     private UserInfo userInfo;
     private ManagerInfo managerInfo;
+    //this gets initialized when the user long clicks an ListView item in fragment
+    private Appointment selectedAppt;
+    private AppointmentState appointmentState;
 
 
     private static final int PROGRESS_FRAG_INDEX = 0;
@@ -139,16 +149,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        //triggers onCreateOptionsMenu which hides the toolbar buttons
+        invalidateOptionsMenu();
 
         drawerLayout = findViewById(R.id.nav_drawer);
-        navigationView = findViewById(R.id.nv);
+        NavigationView navigationView = findViewById(R.id.nv);
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.Open, R.string.Close);
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
 
         //set view pager
-        viewPager = findViewById(R.id.viewPager);
+        ViewPager viewPager = findViewById(R.id.viewPager);
         setupViewPager(viewPager);
 
         TabLayout tabLay = findViewById(R.id.tabLayout);
@@ -173,8 +186,55 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         addUI_Listeners();
         updateUserInfo();
         checkForSmsPermission();
+        createReasonAlertDialog();
 
-        appWasntSetUp = false;
+    }
+
+    private void createReasonAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        LayoutInflater layoutInflater = this.getLayoutInflater();
+
+        final View inflatedView = layoutInflater.inflate(R.layout.reason_layout, null);
+
+        builder.setView(inflatedView);
+
+        builder.setTitle(R.string.title_reason_dialog);
+
+        //doesn't allow the dialog to be canceled when user touches an area that is outside the dialog
+        builder.setCancelable(false);
+
+
+        builder.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                EditText reasonET = reasonAlertDialog.findViewById(R.id.reasonET);
+                String reason = reasonET.getText().toString();
+                maModel.createNotFinishedAppt(selectedAppt, appointmentState, reason);
+
+                selectedAppt = null;
+                appointmentState = null;
+                invalidateOptionsMenu();
+
+                reasonET.setText("");
+            }
+        });
+
+
+        builder.setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //make Toolbar buttons disappear
+                dialogInterface.dismiss();
+
+                selectedAppt = null;
+                appointmentState = null;
+                invalidateOptionsMenu();
+            }
+        });
+
+        reasonAlertDialog = builder.create();
+
     }
 
     private void updateUserInfo() {
@@ -184,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    public void checkForSmsPermission() {
+    private void checkForSmsPermission() {
         if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.SEND_SMS) !=
                 PackageManager.PERMISSION_GRANTED) {
@@ -268,9 +328,45 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 }
 
+
                 break;
+
+            case EDIT_APPT_CODE:
+                if (resultCode == RESULT_OK) {
+                    Appointment possibleNewAppt = data.getExtras().getParcelable(NewAppointmentActivity.NEW_APPOINTMENT_TAG);
+
+                    if (!possibleNewAppt.equals(selectedAppt)) {
+                        maModel.removeAppointmnet(selectedAppt, appointmentState);
+
+                        maModel.addAppointment(possibleNewAppt);
+                    }
+
+                }
+
+
+                selectedAppt = null;
+                appointmentState = null;
+                invalidateOptionsMenu(); //hide action bar buttons
+
+                break;
+
+            case PROVID_FDBK_CODE:
+                if (resultCode == RESULT_OK) {
+                    String[] answers = data.getExtras().getStringArray(ANSWERS_ARRAY_CODE);
+                    maModel.apptFeedbackProvided(selectedAppt, appointmentState, answers);
+
+                }
+
+                selectedAppt = null;
+                appointmentState = null;
+
+                break;
+            default:
+                Log.i(YMCA_TAG, "Invalid code, no activity with this code was launched: " + requestCode);
+
         }
     }
+
 
     private void addModelChangedDataListeners() {
         maModel.getProgressAppts().observe(this, new Observer<List<Appointment>>() {
@@ -343,6 +439,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //add the edit and reaso buttons to Main activity Toolbar
+        getMenuInflater().inflate(R.menu.toolbar_items, menu);
+
+        MenuItem editButton = menu.findItem(R.id.editAppt);
+        MenuItem reasonAppt = menu.findItem(R.id.appt_reason);
+
+        if (selectedAppt == null) {
+            editButton.setVisible(false);
+            reasonAppt.setVisible(false);
+        } else {
+            editButton.setVisible(true);
+            editButton.setVisible(true);
+        }
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     public void onAttachFragment(Fragment fragment) {
         super.onAttachFragment(fragment);
     }
@@ -353,7 +468,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (drawerToggle.onOptionsItemSelected(item))
             return true;
 
-        return super.onOptionsItemSelected(item);
+
+        switch (item.getItemId()) {
+            case R.id.editAppt:
+
+                Intent intent = new Intent(this, NewAppointmentActivity.class);
+                intent.putExtra(EDIT_APPOINTMENT, selectedAppt);
+                startActivityForResult(intent, EDIT_APPT_CODE);
+
+                return true;
+
+            case R.id.appt_reason:
+//                Toast.makeText(this, "Provide reason appt", Toast.LENGTH_SHORT).show();
+                reasonAlertDialog.show();
+                return true;
+
+            default:
+                Toast.makeText(this, "Not a valid option!", Toast.LENGTH_SHORT).show();
+
+                return super.onOptionsItemSelected(item);
+        }
+
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -531,6 +666,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return appointments;
     }
 
+
+    /**
+     * Set selected appt to be edited or marked as not complete
+     */
+    public void setSelectedAppt(Appointment appt, AppointmentState appointmentState) {
+        selectedAppt = appt;
+        this.appointmentState = appointmentState;
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -551,6 +695,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onDestroy() {
         super.onDestroy();
         firebaseAuth.removeAuthStateListener(authStateListener);
-        Log.i(YMCA_TAG, "onDestroy called");
+//        Log.i(YMCA_TAG, "onDestroy called");
     }
 }

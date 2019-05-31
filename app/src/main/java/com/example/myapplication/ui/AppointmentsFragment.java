@@ -1,30 +1,30 @@
 package com.example.myapplication.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.example.myapplication.R;
-import com.example.myapplication.model.ProgressModel;
-import com.example.myapplication.model_firebase.Appointment;
+import com.example.myapplication.model.Appointment;
 import com.example.myapplication.util.AppointmentState;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AppointmentsFragment extends Fragment implements AppointmentsListReceiver {
-    private ProgressModel progressModel;
+import static com.example.myapplication.ui.MainActivity.PROVID_FDBK_CODE;
 
-    private List<Appointment> appointmentList;
+public class AppointmentsFragment extends Fragment implements AppointmentsListReceiver {
+
+    private final List<Appointment> appointmentList;
     private ListView progressAppsLV;
-    //FIXME to be modified later with custom adapter
     private ArrayAdapter<Appointment> appointmentsAdapter;
     private AppointmentState fragmentType;
 
@@ -61,8 +61,54 @@ public class AppointmentsFragment extends Fragment implements AppointmentsListRe
         progressAppsLV = view.findViewById(R.id.progressLV);
         progressAppsLV.setAdapter(appointmentsAdapter);
 
+        //edit or provide reason for canceling event
+        progressAppsLV.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            /*
+             This returns a boolean to indicate whether you have consumed the event and it should not be carried further.
+             That is, return true to indicate that you have handled the event and it should stop here; return false if you have not handled it and/or the event should continue to any other on-click listeners.
+             */
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long rowId) {
+                boolean eventHandled = true;
+
+                //allow editing only of fragments which are UPCOMIN or PROGRESS
+                if (fragmentType.equals(AppointmentState.PROGRESS) || (fragmentType.equals(AppointmentState.UPCOMING))) {
+                    Appointment selectedAppt = appointmentList.get(position);
+                    MainActivity mainActivity = (MainActivity) getActivity();
+                    mainActivity.setSelectedAppt(selectedAppt, fragmentType);
+
+                    //makes the buttons in toolbar appear
+                    mainActivity.invalidateOptionsMenu();
+                }
+
+                return eventHandled;
+            }
+        });
+
+        //go to provide feedback for appt
+        progressAppsLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                if (!fragmentType.equals(AppointmentState.PAST)) {
+                    Appointment selectedAppt = appointmentList.get(position);
+                    MainActivity mainActivity = (MainActivity) getActivity();
+                    mainActivity.setSelectedAppt(selectedAppt, fragmentType);
+
+                    Intent intent = new Intent(mainActivity, ProvideFdbkActivity.class);
+                    //fragments can start activities too and they have their own onActivityResult()
+                    mainActivity.startActivityForResult(intent, PROVID_FDBK_CODE);
+                }
+            }
+        });
+
 
         return view;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -78,15 +124,17 @@ public class AppointmentsFragment extends Fragment implements AppointmentsListRe
         List<Appointment> upToDateAppointments = ((MainActivity) getActivity()).getAppointments(fragmentType);
         int cachedApptsSize = appointmentList.size();
 
+        //FIXME when the last appt is removed/edited the firebase doesn't trigger another data changed event, thus the last element remains in the UI
         if ((upToDateAppointments != null) && (upToDateAppointments.size() != cachedApptsSize)) {
 
-            Log.i(MainActivity.YMCA_TAG, "appt list changed for " + fragmentType);
+//            Log.i(MainActivity.YMCA_TAG, "appt list changed for " + fragmentType);
 
             //maybe run the next two instructions on a separate thread
             appointmentList.clear();
             appointmentList.addAll(upToDateAppointments);
             appointmentsAdapter.notifyDataSetChanged();
         }
+
 
 //    Log.i(MainActivity.YMCA_TAG, "onResume called for " + fragmentType);
     }
@@ -108,7 +156,7 @@ public class AppointmentsFragment extends Fragment implements AppointmentsListRe
     }
 
     @Override
-    public void onAppoinmentsListChanged(List<com.example.myapplication.model_firebase.Appointment> list) {
+    public void onAppoinmentsListChanged(List<Appointment> list) {
         //notify the adapter that data has changed
 
         appointmentList.clear();

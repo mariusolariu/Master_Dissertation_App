@@ -4,8 +4,9 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
-import com.example.myapplication.model_firebase.Appointment;
-import com.example.myapplication.model_firebase.ConnectionFirebase;
+import com.example.myapplication.firebase.AppointmentsListener;
+import com.example.myapplication.firebase.ConnectionFirebase;
+import com.example.myapplication.util.AppointmentState;
 
 import java.util.List;
 
@@ -19,11 +20,10 @@ public class MainActivityModel extends ViewModel implements AppointmentsListener
 
 
     private ConnectionFirebase connectionFirebase;
-    private String userId;
 
 
     public void init(String userId) {
-        this.userId = userId;
+        String userId1 = userId;
 
         progressAppts = new MutableLiveData<>();
         upcomingAppts = new MutableLiveData<>();
@@ -118,8 +118,8 @@ public class MainActivityModel extends ViewModel implements AppointmentsListener
 
     //interract with Firebase to remove appointment
     //Should they be allowed to do it?
-    public void removeAppointmnet(Appointment x) {
-
+    public void removeAppointmnet(Appointment x, AppointmentState appointmentState) {
+        connectionFirebase.removeAppointment(x, appointmentState);
     }
 
     @Override
@@ -128,4 +128,23 @@ public class MainActivityModel extends ViewModel implements AppointmentsListener
         //clear any subscription of data
     }
 
+    /**
+     * move appointment to past appts and add a reason for not executing it
+     */
+    public void createNotFinishedAppt(Appointment selectedAppt, AppointmentState appointmentState, String reason) {
+        connectionFirebase.createNotFinishedAppt(selectedAppt, appointmentState, reason);
+    }
+
+    /**
+     * Called when the user has provide for an appointment. The appointment has to be moved from initial category to PAST appts and the answers stored under the same key in "feedback" node
+     */
+    public void apptFeedbackProvided(final Appointment selectedAppt, final AppointmentState appointmentState, final String[] answers) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                connectionFirebase.apptFeedbackProvided(selectedAppt, appointmentState, answers);
+            }
+        }).start();
+
+    }
 }

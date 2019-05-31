@@ -1,16 +1,20 @@
-package com.example.myapplication.model_firebase;
+package com.example.myapplication.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Objects;
+
 public class Appointment implements Parcelable {
+    private String apptKey;
     private String location;
     private String m_code;
     private String date;
     private String start_time;
     private String end_time;
 
-    public Appointment(String location, String m_code, String date, String start_time, String end_time, String feedbackProvided) {
+    public Appointment(String apptKey, String location, String m_code, String date, String start_time, String end_time, String feedbackProvided) {
+        this.apptKey = apptKey;
         this.location = location;
         this.m_code = m_code;
         this.date = date;
@@ -20,6 +24,7 @@ public class Appointment implements Parcelable {
     }
 
     protected Appointment(Parcel in) {
+        apptKey = in.readString();
         location = in.readString();
         m_code = in.readString();
         date = in.readString();
@@ -30,6 +35,7 @@ public class Appointment implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(apptKey);
         dest.writeString(location);
         dest.writeString(m_code);
         dest.writeString(date);
@@ -55,32 +61,16 @@ public class Appointment implements Parcelable {
         }
     };
 
-    public String getFeedbackProvided() {
-        return feedbackProvided;
-    }
-
-    public void setFeedbackProvided(String feedbackProvided) {
-        this.feedbackProvided = feedbackProvided;
-    }
-
     private String feedbackProvided;
 
     public String getStart_time() {
         return start_time;
     }
 
-    public void setStart_time(String start_time) {
-        this.start_time = start_time;
-    }
-
 
     //necessary for firebase. Do not delete
-    public Appointment(){
+    public Appointment() {
 
-    }
-
-    public void setEnd_time(String end_time) {
-        this.end_time = end_time;
     }
 
     public String getEnd_time() {
@@ -91,11 +81,6 @@ public class Appointment implements Parcelable {
     public Appointment(String location, String m_code) {
         this.location = location;
         this.m_code = m_code;
-    }
-
-
-    public void setDate(String date) {
-        this.date = date;
     }
 
 
@@ -111,31 +96,48 @@ public class Appointment implements Parcelable {
         return m_code;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public void setM_code(String m_code) {
-        this.m_code = m_code;
+    public void setApptKey(String apptKey) {
+        this.apptKey = apptKey;
     }
 
     @Override
     public String toString() {
-        StringBuilder buffer = new StringBuilder();
-        buffer.append(m_code);
-        buffer.append("\n");
+        String buffer = apptKey +
+                '\n' +
+                m_code +
+                "\n" +
+                location +
+                "\n" +
+                start_time +
+                "\n" +
+                end_time +
+                "\n" +
+                date;
+        return buffer;
+    }
 
-        buffer.append(location);
-        buffer.append("\n");
+    public String getApptKey() {
+        return apptKey;
+    }
 
-        buffer.append(start_time);
-        buffer.append("\n");
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
 
-        buffer.append(end_time);
-        buffer.append("\n");
+        if (!(obj instanceof Appointment)) return false;
 
-        buffer.append(date);
+        Appointment other = (Appointment) obj;
 
-        return buffer.toString();
+        return this.m_code.equals(other.m_code) &&
+                this.location.equals(other.location) &&
+                this.start_time.equals(other.start_time) &&
+                this.end_time.equals(other.end_time) &&
+                this.date.equals(other.date) &&
+                this.feedbackProvided.equals(other.feedbackProvided);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(m_code, location, start_time, end_time, date, feedbackProvided);
     }
 }

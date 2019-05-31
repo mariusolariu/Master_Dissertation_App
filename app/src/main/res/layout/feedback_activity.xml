@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/q1TV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:layout_margin="5dp"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:textStyle="bold"
+            android:text="@string/q1" />
+
+        <EditText
+            android:id="@+id/q1ET"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:hint="@string/answer_question"
+            android:background="@drawable/edit_text_border"
+            android:textSize="13sp"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:inputType="textMultiLine"
+            android:importantForAutofill="no"
+            android:maxLines="3"
+            android:lines="3" />
+
+        <TextView
+            android:id="@+id/q2TV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:layout_margin="5dp"
+            android:paddingEnd="5dp"
+            android:paddingStart="5dp"
+            android:textStyle="bold"
+            android:text="@string/q2" />
+
+        <EditText
+            android:id="@+id/q2ET"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:hint="@string/answer_question"
+            android:importantForAutofill="no"
+            android:background="@drawable/edit_text_border"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:textSize="13sp"
+            android:inputType="textMultiLine"
+            android:maxLines="3"
+            android:lines="3" />
+
+
+        <TextView
+            android:id="@+id/q3TV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:layout_margin="5dp"
+            android:paddingEnd="5dp"
+            android:textStyle="bold"
+            android:paddingStart="5dp"
+            android:text="@string/q3" />
+
+        <EditText
+            android:id="@+id/q3ET"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:hint="@string/answer_question"
+            android:paddingEnd="5dp"
+            android:importantForAutofill="no"
+            android:background="@drawable/edit_text_border"
+            android:textSize="13sp"
+            android:paddingStart="5dp"
+            android:inputType="textMultiLine"
+            android:maxLines="3"
+            android:lines="3" />
+
+        <TextView
+            android:id="@+id/q4TV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:layout_margin="5dp"
+            android:textStyle="bold"
+            android:paddingEnd="5dp"
+            android:paddingStart="5dp"
+            android:text="@string/q4" />
+
+        <EditText
+            android:id="@+id/q4ET"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:hint="@string/answer_question"
+            android:importantForAutofill="no"
+            android:paddingEnd="5dp"
+            android:background="@drawable/edit_text_border"
+            android:textSize="13sp"
+            android:paddingStart="5dp"
+            android:inputType="textMultiLine"
+            android:maxLines="3"
+            android:lines="3" />
+
+        <TextView
+            android:id="@+id/q5TV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:layout_margin="5dp"
+            android:textStyle="bold"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:text="@string/q5" />
+
+        <EditText
+            android:id="@+id/q5ET"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:hint="@string/answer_question"
+            android:importantForAutofill="no"
+            android:background="@drawable/edit_text_border"
+            android:textSize="13sp"
+            android:inputType="textMultiLine"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:maxLines="3"
+            android:lines="3" />
+
+        <!--
+        <TextView
+            android:id="@+id/q6TV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:layout_margin="5dp"
+            android:textStyle="bold"
+            android:text="Any other comments?"/>
+
+        <EditText
+            android:id="@+id/q6ET"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:hint="@string/answer_question_text"
+            android:background="@drawable/edit_text_border"
+            android:textSize="13sp"
+            android:inputType="textMultiLine"
+            android:maxLines="3"
+            android:lines="3"/>
+
+        <TextView
+            android:id="@+id/q7TV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:layout_margin="5dp"
+            android:textStyle="bold"
+            android:text="Any other comments?"/>
+
+        <EditText
+            android:id="@+id/q7ET"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:hint="@string/answer_question_text"
+            android:background="@drawable/edit_text_border"
+            android:textSize="13sp"
+            android:inputType="textMultiLine"
+            android:maxLines="3"
+            android:lines="3"/>
+            -->
+
+
+        <Button
+            android:id="@+id/saveFdbkBtn"
+            android:layout_margin="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/greenSave"
+            android:text="@string/save_btn_text"
+            android:textAllCaps="false" />
+
+    </LinearLayout>
+</ScrollView>
+
+

@@ -17,11 +17,7 @@ import static com.example.myapplication.ui.MainActivity.REQ_SIGN_IN;
 //NOT USED FOR THE MOMENT
 
 public class SingInListener implements FirebaseAuth.AuthStateListener {
-    private MainActivity mainActivity;
-
-    public SingInListener(MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
-    }
+    private final MainActivity mainActivity;
 
     @Override
     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {

@@ -21,9 +21,7 @@ public class SignUpActivity extends AppCompatActivity implements DroidListener {
 
     private EditText emailET;
     private EditText passwordET;
-    private Button signInButton;
 
-    private DroidNet mDroidNet;
     private boolean activWasntSetUp = true;
 
     @Override
@@ -32,14 +30,14 @@ public class SignUpActivity extends AppCompatActivity implements DroidListener {
         setContentView(R.layout.activity_login);
 
         DroidNet.init(this);
-        mDroidNet = DroidNet.getInstance();
+        DroidNet mDroidNet = DroidNet.getInstance();
         mDroidNet.addInternetConnectivityListener(this);
     }
 
     private void setUp() {
         emailET = findViewById(R.id.emailET);
         passwordET = findViewById(R.id.passwordET);
-        signInButton = findViewById(R.id.loginB);
+        Button signInButton = findViewById(R.id.loginB);
 
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override

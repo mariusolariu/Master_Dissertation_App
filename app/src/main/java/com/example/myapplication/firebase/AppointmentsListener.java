@@ -1,6 +1,8 @@
-package com.example.myapplication.model;
+package com.example.myapplication.firebase;
 
-import com.example.myapplication.model_firebase.Appointment;
+import com.example.myapplication.model.Appointment;
+import com.example.myapplication.model.ManagerInfo;
+import com.example.myapplication.model.UserInfo;
 
 import java.util.List;
 

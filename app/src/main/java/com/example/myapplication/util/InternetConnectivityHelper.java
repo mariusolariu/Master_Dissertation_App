@@ -44,12 +44,13 @@ public class InternetConnectivityHelper {
         final Builder builderIAD = new Builder(appContext);
         CharSequence[] options = {"Wi-Fi", "Mobile data"};
 
+        builderIAD.setCancelable(false);
+
         builderIAD.setTitle(R.string.network_off_title);
-        /**
+        /*
          * DialogInterface - Interface that defines a dialog-type class that can be shown, dismissed, or canceled, <br>
          * and may have buttons that can be clicked.
          */
-
         final DialogInterfListener hmsDialogInterfListener = new DialogInterfListener();
 
         builderIAD.setSingleChoiceItems(options, 0, hmsDialogInterfListener);
@@ -117,7 +118,7 @@ public class InternetConnectivityHelper {
             }
         }
 
-        public int getSelectedOption() {
+        int getSelectedOption() {
             return selectedOption;
         }
     }
