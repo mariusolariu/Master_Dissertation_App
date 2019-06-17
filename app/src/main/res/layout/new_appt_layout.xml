@@ -64,7 +64,6 @@
             android:text="@string/start_time_message" />
 
         <include
-            android:id="@+id/start_time_p_id"
             layout="@layout/time_picker_layout" />
 
         <ImageView
@@ -79,9 +78,7 @@
             android:layout_margin="5dp"
             android:text="@string/end_time_message" />
 
-        <include
-            android:id="@+id/end_time_p_id"
-            layout="@layout/time_picker_layout" />
+        <include layout="@layout/time_picker_layout_end" />
 
         <ImageView
             android:layout_row="0"

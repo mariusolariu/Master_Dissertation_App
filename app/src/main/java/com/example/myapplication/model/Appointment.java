@@ -13,14 +13,13 @@ public class Appointment implements Parcelable {
     private String start_time;
     private String end_time;
 
-    public Appointment(String apptKey, String location, String m_code, String date, String start_time, String end_time, String feedbackProvided) {
+    public Appointment(String apptKey, String location, String m_code, String date, String start_time, String end_time) {
         this.apptKey = apptKey;
         this.location = location;
         this.m_code = m_code;
         this.date = date;
         this.start_time = start_time;
         this.end_time = end_time;
-        this.feedbackProvided = feedbackProvided;
     }
 
     protected Appointment(Parcel in) {
@@ -29,7 +28,6 @@ public class Appointment implements Parcelable {
         m_code = in.readString();
         date = in.readString();
         start_time = in.readString();
-        feedbackProvided = in.readString();
         end_time = in.readString();
     }
 
@@ -40,7 +38,6 @@ public class Appointment implements Parcelable {
         dest.writeString(m_code);
         dest.writeString(date);
         dest.writeString(start_time);
-        dest.writeString(feedbackProvided);
         dest.writeString(end_time);
     }
 
@@ -61,7 +58,6 @@ public class Appointment implements Parcelable {
         }
     };
 
-    private String feedbackProvided;
 
     public String getStart_time() {
         return start_time;
@@ -132,12 +128,11 @@ public class Appointment implements Parcelable {
                 this.location.equals(other.location) &&
                 this.start_time.equals(other.start_time) &&
                 this.end_time.equals(other.end_time) &&
-                this.date.equals(other.date) &&
-                this.feedbackProvided.equals(other.feedbackProvided);
+                this.date.equals(other.date);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(m_code, location, start_time, end_time, date, feedbackProvided);
+        return Objects.hash(m_code, location, start_time, end_time, date);
     }
 }

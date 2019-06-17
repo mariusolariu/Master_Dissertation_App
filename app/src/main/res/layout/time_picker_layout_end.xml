@@ -5,7 +5,7 @@
     android:id="@+id/t_picker_layout">
 
     <TimePicker
-        android:id="@+id/start_time_p_id"
+        android:id="@+id/end_time_p_id"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:timePickerMode="spinner">

@@ -74,12 +74,6 @@ public class MainActivityModel extends ViewModel implements AppointmentsListener
         return progressAppts.getValue();
     }
 
-    //handle insert probably through this as well
-
-
-    //FIXME handle the db fetching of data and check it
-    //then implement the logic for moving an appointment from one section to another
-
     @Override
     public void onProgressApptsChanged(List<Appointment> progressAppts) {
         //the appoinments list was changed
@@ -146,5 +140,14 @@ public class MainActivityModel extends ViewModel implements AppointmentsListener
             }
         }).start();
 
+    }
+
+    public void participantFdbkProvided(final Appointment selectedAppt, final String participantMessage) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                connectionFirebase.participantFdbkProvided(selectedAppt, participantMessage);
+            }
+        }).start();
     }
 }

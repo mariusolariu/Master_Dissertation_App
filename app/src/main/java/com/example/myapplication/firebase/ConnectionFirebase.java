@@ -22,17 +22,20 @@ import java.util.List;
 
 //logic for interacting with the firebase database
 public class ConnectionFirebase {
+    private static final int PAST_APPTS_RETURNED_SIZE = 15;
     private final DatabaseReference databaseReference;
     private final AppointmentsListener listener;
     private final String userId;
 
     static final String PROGRESS_NODE = "progressAppts";
+    static final String USERS_NODE = "users";
     static final String UPCOMING_NODE = "upcomingAppts";
     static final String FEEDBACK_NODE = "feedbackAppts";
     private static final String NOT_FINISHED_NODE = "notFinishedAppts";
     private static final String PAST_NODE = "pastAppts";
     private static final String USER_NODE = "userInfo";
     private static final String MANAGER_NODE = "managerInfo";
+    private static final String PARTICIPANT_FEEDBACK_NODE = "participantNode";
     private static final String FEEDBACK_COMPLETED_APPTS_NODE = "feedback_completed_appts";
 
     public ConnectionFirebase(AppointmentsListener listener, String userId) {
@@ -46,7 +49,7 @@ public class ConnectionFirebase {
     void addListenersForCategories() {
 
 
-        databaseReference.child(userId).addChildEventListener(new ChildEventListener() {
+        databaseReference.child(USERS_NODE).child(userId).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String previousElementKey) {
 
@@ -90,9 +93,10 @@ public class ConnectionFirebase {
         });
 
 
-        //TODO improvement: maybe replace the node listeners with ChildEventListener
+        //NOTE improvement: maybe replace the node listeners with ChildEventListener
         // ValueEventListener returns the whole list of data
-        databaseReference.child(userId).child(PROGRESS_NODE).addValueEventListener(new ValueEventListener() {
+        // Result: I tried but when a deletion/insertion occurs it takes long until the ui is notified by the model
+        databaseReference.child(USERS_NODE).child(userId).child(PROGRESS_NODE).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -120,7 +124,7 @@ public class ConnectionFirebase {
         });
 
 
-        databaseReference.child(userId).child(UPCOMING_NODE).addValueEventListener(new ValueEventListener() {
+        databaseReference.child(USERS_NODE).child(userId).child(UPCOMING_NODE).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -147,7 +151,7 @@ public class ConnectionFirebase {
             }
         });
 
-        databaseReference.child(userId).child(FEEDBACK_NODE).addValueEventListener(new ValueEventListener() {
+        databaseReference.child(USERS_NODE).child(userId).child(FEEDBACK_NODE).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -175,8 +179,7 @@ public class ConnectionFirebase {
         });
 
 
-        //TODO: add a query which returns ten most recent past appts and then a listener to it
-        databaseReference.child(userId).child(PAST_NODE).addValueEventListener(new ValueEventListener() {
+        databaseReference.child(USERS_NODE).child(userId).child(PAST_NODE).orderByKey().limitToFirst(PAST_APPTS_RETURNED_SIZE).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -203,7 +206,7 @@ public class ConnectionFirebase {
             }
         });
 
-        databaseReference.child(userId).child(USER_NODE).addValueEventListener(new ValueEventListener() {
+        databaseReference.child(USERS_NODE).child(userId).child(USER_NODE).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 UserInfo userInfo = dataSnapshot.getValue(UserInfo.class);
@@ -239,14 +242,14 @@ public class ConnectionFirebase {
      * -> move from progress to feedback appointments which are done
      */
     private void updateAppointmentsDb() {
-        databaseReference.child(userId).addListenerForSingleValueEvent(new UpdateApptsListener(this, userId));
+        databaseReference.child(USERS_NODE).child(userId).addListenerForSingleValueEvent(new UpdateApptsListener(this, userId));
+
 
     }
 
     public void addAppointment(Appointment appt) {
-        //TODO: maybe decide if it needs to be put in Progress appts or Upcoming appts based on when is scheduled to take place
         //push() generates a key that takes into account the timestamp, so the list elements can be sorted chronologically
-        databaseReference.child(userId).child(UPCOMING_NODE).push().setValue(appt);
+        databaseReference.child(USERS_NODE).child(userId).child(UPCOMING_NODE).push().setValue(appt);
     }
 
 
@@ -258,11 +261,11 @@ public class ConnectionFirebase {
 
         switch (appointmentState) {
             case PROGRESS:
-                databaseReference.child(userId).child(PROGRESS_NODE).child(key).setValue(null);
+                databaseReference.child(USERS_NODE).child(userId).child(PROGRESS_NODE).child(key).setValue(null);
                 break;
 
             case UPCOMING:
-                databaseReference.child(userId).child(UPCOMING_NODE).child(key).setValue(null);
+                databaseReference.child(USERS_NODE).child(userId).child(UPCOMING_NODE).child(key).setValue(null);
                 break;
 
         }
@@ -273,32 +276,44 @@ public class ConnectionFirebase {
 
         FirebaseHelper.moveAppointment(databaseReference, userId, sourceAppointmentType, PAST_NODE, selectedAppt);
 
-        databaseReference.child(userId).child(NOT_FINISHED_NODE).child(selectedAppt.getApptKey()).setValue(reason);
+        databaseReference.child(USERS_NODE).child(userId).child(NOT_FINISHED_NODE).child(selectedAppt.getApptKey()).setValue(reason);
     }
 
     public void apptFeedbackProvided(Appointment selectedAppt, AppointmentState appointmentState, String[] answers) {
-        String sourceAppointmentType = "";
+        String sourceAppointmentType = toAppointmentNode(appointmentState);
         String apptKey = selectedAppt.getApptKey();
+
+        FirebaseHelper.moveAppointment(databaseReference, userId, sourceAppointmentType, PAST_NODE, selectedAppt);
+
+        for (int i = 0; i < answers.length; i++) {
+            databaseReference.child(USERS_NODE).child(userId).child(FEEDBACK_COMPLETED_APPTS_NODE).child(apptKey).child("q" + (i + 1) + "_answer").setValue(answers[i]);
+        }
+
+    }
+
+    public void participantFdbkProvided(Appointment selectedAppt, String participantMessage) {
+        String apptKey = selectedAppt.getApptKey();
+        databaseReference.child(USERS_NODE).child(userId).child(PARTICIPANT_FEEDBACK_NODE).child(apptKey).setValue(participantMessage);
+    }
+
+    private String toAppointmentNode(AppointmentState appointmentState) {
+        String appointmentNode = "";
 
         switch (appointmentState) {
             case PROGRESS:
-                sourceAppointmentType = PROGRESS_NODE;
+                appointmentNode = PROGRESS_NODE;
                 break;
             case UPCOMING:
-                sourceAppointmentType = UPCOMING_NODE;
+                appointmentNode = UPCOMING_NODE;
                 break;
             case FEEDBACK:
-                sourceAppointmentType = FEEDBACK_NODE;
+                appointmentNode = FEEDBACK_NODE;
                 break;
             default:
                 Log.i(MainActivity.YMCA_TAG, "Invalid appointment state:  " + appointmentState.toString());
         }
 
-        FirebaseHelper.moveAppointment(databaseReference, userId, sourceAppointmentType, PAST_NODE, selectedAppt);
-
-        for (int i = 0; i < answers.length; i++) {
-            databaseReference.child(userId).child(FEEDBACK_COMPLETED_APPTS_NODE).child(apptKey).child("q" + (i + 1) + "_answer").setValue(answers[i]);
-        }
-
+        return appointmentNode;
     }
+
 }

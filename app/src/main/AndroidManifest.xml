@@ -35,13 +35,19 @@
         <activity
             android:name=".ui.ProvideFdbkActivity"
             android:label="@string/feedback_activ"
-            android:theme="@style/AppTheme"
-            android:parentActivityName=".ui.MainActivity" />
+            android:parentActivityName=".ui.MainActivity"
+            android:theme="@style/AppTheme" />
 
         <activity
             android:name=".ui.SignUpActivity"
             android:label="@string/title_activity_login"
             android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".ui.ParticipantFdbkActivity"
+            android:label="Participant Feedback"
+            android:theme="@style/AppTheme"
+            android:parentActivityName=".ui.MainActivity" />
 
     </application>
 

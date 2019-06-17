@@ -50,7 +50,6 @@ class AppointmentAdapter extends ArrayAdapter<Appointment> {
         Appointment appointment = appointments.get(position);
 
         itemHolder.menteeTV.setText(appointment.getM_code());
-        //FIXME: maybe create a separate field for the time
         String timesAndDate = appointment.getStart_time() + "-" + appointment.getEnd_time() + " " + appointment.getDate();
         itemHolder.dateTV.setText(timesAndDate);
         itemHolder.locationTV.setText(appointment.getLocation());

@@ -19,8 +19,8 @@ import com.example.myapplication.ui.MainActivity;
  * Whenever the device doesn't have an Internet connection the user is forced to connect using Wifi/Mob Data.
  * This class creates the needed dialog
  */
-public class InternetConnectivityHelper {
-    private static InternetConnectivityHelper instance;
+public class InternetDialogHelper {
+    private static InternetDialogHelper instance;
     private Context appContext;
     private AlertDialog internetAlertDialog;
 
@@ -28,11 +28,12 @@ public class InternetConnectivityHelper {
     private final int MOBILE_DATA = 1;
 
 
-    private InternetConnectivityHelper(){}
+    private InternetDialogHelper() {
+    }
 
-    public static InternetConnectivityHelper getInstance(Context context){
+    public static InternetDialogHelper getInstance(Context context) {
         if (instance == null) {
-            instance = new InternetConnectivityHelper();
+            instance = new InternetDialogHelper();
             instance.appContext = context;
             instance.createInternetDialog();
         }
@@ -92,8 +93,6 @@ public class InternetConnectivityHelper {
             public void onClick(DialogInterface dialogInterface, int i) {
                 ((AppCompatActivity) appContext).finishAffinity();
 
-                //FIXME might not be the best solution
-//                System.exit(0);
             }
         });
 

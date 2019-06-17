@@ -37,10 +37,10 @@ public class UpdateApptsListener implements ValueEventListener {
 
     @Override
     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-        Iterable<DataSnapshot> upcomingAppts = dataSnapshot.child(userID).child(UPCOMING_NODE).getChildren();
+        Iterable<DataSnapshot> upcomingAppts = dataSnapshot.child(owner.USERS_NODE).child(userID).child(UPCOMING_NODE).getChildren();
         updateUpcomingAppts(upcomingAppts);
 
-        Iterable<DataSnapshot> progressSnapshots = dataSnapshot.child(userID).child(PROGRESS_NODE).getChildren();
+        Iterable<DataSnapshot> progressSnapshots = dataSnapshot.child(owner.USERS_NODE).child(userID).child(PROGRESS_NODE).getChildren();
         updateProgressAppts(progressSnapshots);
 
     }

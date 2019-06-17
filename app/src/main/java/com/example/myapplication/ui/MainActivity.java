@@ -43,7 +43,7 @@ import com.example.myapplication.model.MainActivityModel;
 import com.example.myapplication.model.ManagerInfo;
 import com.example.myapplication.model.UserInfo;
 import com.example.myapplication.util.AppointmentState;
-import com.example.myapplication.util.InternetConnectivityHelper;
+import com.example.myapplication.util.InternetDialogHelper;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -62,13 +62,16 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, DroidListener {
     public static final String YMCA_TAG = "Ymca_Paisley";
+    final static String EDIT_APPOINTMENT = "EDIT_APPOINTMENT";
+    final static String ANSWERS_ARRAY_CODE = "ANSWERS_ARRAY_CODE";
+    final static String PARTICIPANT_FEEDBACK = "PARTICIPANT_FEEDBACK";
+
     private static final int NEW_APPT_CODE = 100;
     static final int REQ_SIGN_IN = 101;
     private static final int REQ_SMS_PERMISSION = 102;
     private static final int EDIT_APPT_CODE = 103;
     static final int PROVID_FDBK_CODE = 104;
-    final static String EDIT_APPOINTMENT = "EDIT_APPOINTMENT";
-    final static String ANSWERS_ARRAY_CODE = "ANSWERS_ARRAY_CODE";
+    static final int PARTICIPANT_PROVID_FDBK_CODE = 105;
 
     //ui
     private DrawerLayout drawerLayout;
@@ -142,11 +145,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    public void setUpApp(String userId) {
+    public void setUpApp(final String userId) {
         maModel.init(userId);
 
         addApptBtn = findViewById(R.id.newAppointmentFB);
-
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -359,8 +361,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 selectedAppt = null;
                 appointmentState = null;
+                invalidateOptionsMenu();
 
                 break;
+
+            case PARTICIPANT_PROVID_FDBK_CODE:
+                if (resultCode == RESULT_OK) {
+                    String participantMessage = data.getExtras().getString(PARTICIPANT_FEEDBACK);
+                    maModel.participantFdbkProvided(selectedAppt, participantMessage);
+                }
+
+                selectedAppt = null;
+                appointmentState = null;
+                invalidateOptionsMenu();
+
             default:
                 Log.i(YMCA_TAG, "Invalid code, no activity with this code was launched: " + requestCode);
 
@@ -445,13 +459,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         MenuItem editButton = menu.findItem(R.id.editAppt);
         MenuItem reasonAppt = menu.findItem(R.id.appt_reason);
+        MenuItem provideFeedback = menu.findItem(R.id.provFeedback);
 
         if (selectedAppt == null) {
             editButton.setVisible(false);
             reasonAppt.setVisible(false);
+            provideFeedback.setVisible(false);
         } else {
             editButton.setVisible(true);
             editButton.setVisible(true);
+            provideFeedback.setVisible(true);
         }
 
         return super.onCreateOptionsMenu(menu);
@@ -479,8 +496,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return true;
 
             case R.id.appt_reason:
-//                Toast.makeText(this, "Provide reason appt", Toast.LENGTH_SHORT).show();
                 reasonAlertDialog.show();
+                return true;
+
+            case R.id.provFeedback:
+                Intent intent1 = new Intent(this, ParticipantFdbkActivity.class);
+                startActivityForResult(intent1, PARTICIPANT_PROVID_FDBK_CODE);
+
                 return true;
 
             default:
@@ -620,7 +642,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onInternetConnectivityChanged(boolean isConnected) {
-        InternetConnectivityHelper icHelper = InternetConnectivityHelper.getInstance(this);
+        InternetDialogHelper icHelper = InternetDialogHelper.getInstance(this);
 
         if (isConnected) {
 

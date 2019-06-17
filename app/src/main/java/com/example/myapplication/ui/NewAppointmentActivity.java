@@ -141,8 +141,7 @@ public class NewAppointmentActivity extends AppCompatActivity implements DroidLi
                 String date = dateET.getText().toString();
                 String feedbackProvided = "no";
 
-                //TODO might need to modifiy it at a later time
-                Appointment newAppt = new Appointment("", location, menteeCode, date, start_time, end_time, feedbackProvided);
+                Appointment newAppt = new Appointment("", location, menteeCode, date, start_time, end_time);
 
                 Intent intent = new Intent();
                 intent.putExtra(NEW_APPOINTMENT_TAG, newAppt);

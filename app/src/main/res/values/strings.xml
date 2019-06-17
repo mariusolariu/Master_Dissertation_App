@@ -45,4 +45,8 @@
     <string name="q5">Any other comments?</string>
     <string name="answer_question">Answer this question...</string>
     <string name="edit_appt">Edit Appointment</string>
+    <string name="meeting_fdbk_question">How was your meeting?</string>
+    <string name="sat_message">Satisified user button</string>
+    <string name="neutral_message">Neutral user button</string>
+    <string name="diss_message">Dissatisfied user button</string>
 </resources>

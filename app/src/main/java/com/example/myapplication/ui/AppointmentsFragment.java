@@ -124,7 +124,6 @@ public class AppointmentsFragment extends Fragment implements AppointmentsListRe
         List<Appointment> upToDateAppointments = ((MainActivity) getActivity()).getAppointments(fragmentType);
         int cachedApptsSize = appointmentList.size();
 
-        //FIXME when the last appt is removed/edited the firebase doesn't trigger another data changed event, thus the last element remains in the UI
         if ((upToDateAppointments != null) && (upToDateAppointments.size() != cachedApptsSize)) {
 
 //            Log.i(MainActivity.YMCA_TAG, "appt list changed for " + fragmentType);

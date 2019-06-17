@@ -7,10 +7,11 @@ class FirebaseHelper {
     static void moveAppointment(DatabaseReference databaseReference, String userID, String sourceCategory, String destinationCategory, Appointment a) {
         String apptName = a.getApptKey();
         //delete
-        databaseReference.child(userID).child(sourceCategory).child(apptName).setValue(null);
+        databaseReference.child(ConnectionFirebase.USERS_NODE).child(userID).child(sourceCategory).child(apptName).setValue(null);
 
         //add
-        //FIXME: introduces an extra field in under the appointment entry in DB, namely appt name
-        databaseReference.child(userID).child(destinationCategory).child(apptName).setValue(a);
+        databaseReference.child(ConnectionFirebase.USERS_NODE).child(userID).child(destinationCategory).child(apptName).setValue(a);
     }
+
+
 }
