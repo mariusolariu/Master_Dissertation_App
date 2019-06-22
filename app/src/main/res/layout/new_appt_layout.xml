@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/newApptLayId">
 
 
     <GridLayout
+        android:id="@+id/containerNewApptId"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
         android:columnCount="3"
         android:rowCount="6"
 
         >
+        <!--
+        This margin blocks the addNewAppointment() test to pass
+        android:layout_margin="5dp"-->
 
         <ImageView
 
@@ -100,7 +104,7 @@
             android:inputType="text" />
 
         <Button
-            android:id="@+id/saveBtn"
+            android:id="@+id/saveNewApptsB"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_columnSpan="3"

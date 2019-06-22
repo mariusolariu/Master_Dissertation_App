@@ -58,7 +58,7 @@ public class AppointmentsFragment extends Fragment implements AppointmentsListRe
 //    Log.i(MainActivity.YMCA_TAG, "onCreateView called " + fragmentType);
         View view = inflater.inflate(R.layout.fragment_layout, container, false);
 
-        progressAppsLV = view.findViewById(R.id.progressLV);
+        progressAppsLV = view.findViewById(R.id.apptsLV);
         progressAppsLV.setAdapter(appointmentsAdapter);
 
         //edit or provide reason for canceling event
@@ -124,7 +124,9 @@ public class AppointmentsFragment extends Fragment implements AppointmentsListRe
         List<Appointment> upToDateAppointments = ((MainActivity) getActivity()).getAppointments(fragmentType);
         int cachedApptsSize = appointmentList.size();
 
-        if ((upToDateAppointments != null) && (upToDateAppointments.size() != cachedApptsSize)) {
+        if ((upToDateAppointments != null) &&
+                ((upToDateAppointments.size() != cachedApptsSize) ||
+                        !upToDateAppointments.equals(appointmentList))) {
 
 //            Log.i(MainActivity.YMCA_TAG, "appt list changed for " + fragmentType);
 

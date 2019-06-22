@@ -3,21 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/appt_reason"
+        android:id="@+id/prvidReasoB"
         android:title="@string/reason_for_not_completing_appt"
         android:contentDescription="@string/reason_for_not_completing_appt"
         android:icon="@drawable/appt_reason_icon"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/provFeedback"
+        android:id="@+id/participantFeedReasB"
         android:title="@string/reason_for_not_completing_appt"
         android:contentDescription="@string/reason_for_not_completing_appt"
         android:icon="@drawable/feedback_icon"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/editAppt"
+        android:id="@+id/editApptB"
         android:contentDescription="@string/edit_appointment_butt_text"
         android:icon="@drawable/edit_icon"
         android:title="@string/edit_appt"

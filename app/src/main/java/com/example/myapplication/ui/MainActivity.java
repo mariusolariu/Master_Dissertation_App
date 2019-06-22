@@ -46,6 +46,7 @@ import com.example.myapplication.util.AppointmentState;
 import com.example.myapplication.util.InternetDialogHelper;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -104,6 +105,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
 
+    //used for telling Espresso sign in test to wait for operation to finish
+//    CountingIdlingResource singInResource = new CountingIdlingResource("SING_IN_RESOURCE");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DroidNet.init(this);
         DroidNet.getInstance().addInternetConnectivityListener(this);
 
-
+        FirebaseApp.initializeApp(this);
         firebaseAuth = FirebaseAuth.getInstance();
 
         authStateListener = new FirebaseAuth.AuthStateListener() {
@@ -210,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         builder.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                EditText reasonET = reasonAlertDialog.findViewById(R.id.reasonET);
+                EditText reasonET = reasonAlertDialog.findViewById(R.id.reasonNotCompletingApptET);
                 String reason = reasonET.getText().toString();
                 maModel.createNotFinishedAppt(selectedAppt, appointmentState, reason);
 
@@ -291,6 +295,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+
+//    //used only for testing
+//    public CountingIdlingResource getSingInResource() {
+//
+//        if (singInResource == null) {
+//            singInResource = new CountingIdlingResource("SING_IN_RESOURCE");
+//        }
+//        return singInResource;
+//    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -313,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         loginPB = findViewById(R.id.indeterminatePB);
                     }
                     loginPB.setVisibility(View.VISIBLE);
-
+//                    singInResource.increment();
 
                     firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
@@ -324,6 +338,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             } else {
                                 //Succesful login
                                 MainActivity.this.loginPB.setVisibility(View.GONE);
+
+                                //Strictly used for testing login with Espresso
+//                                singInResource.decrement();
                             }
                         }
                     });
@@ -457,9 +474,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //add the edit and reaso buttons to Main activity Toolbar
         getMenuInflater().inflate(R.menu.toolbar_items, menu);
 
-        MenuItem editButton = menu.findItem(R.id.editAppt);
-        MenuItem reasonAppt = menu.findItem(R.id.appt_reason);
-        MenuItem provideFeedback = menu.findItem(R.id.provFeedback);
+        MenuItem editButton = menu.findItem(R.id.editApptB);
+        MenuItem reasonAppt = menu.findItem(R.id.prvidReasoB);
+        MenuItem provideFeedback = menu.findItem(R.id.participantFeedReasB);
 
         if (selectedAppt == null) {
             editButton.setVisible(false);
@@ -487,7 +504,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         switch (item.getItemId()) {
-            case R.id.editAppt:
+            case R.id.editApptB:
 
                 Intent intent = new Intent(this, NewAppointmentActivity.class);
                 intent.putExtra(EDIT_APPOINTMENT, selectedAppt);
@@ -495,11 +512,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 return true;
 
-            case R.id.appt_reason:
+            case R.id.prvidReasoB:
                 reasonAlertDialog.show();
                 return true;
 
-            case R.id.provFeedback:
+            case R.id.participantFeedReasB:
                 Intent intent1 = new Intent(this, ParticipantFdbkActivity.class);
                 startActivityForResult(intent1, PARTICIPANT_PROVID_FDBK_CODE);
 

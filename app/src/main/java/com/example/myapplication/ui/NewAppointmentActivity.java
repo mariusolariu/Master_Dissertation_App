@@ -50,7 +50,7 @@ public class NewAppointmentActivity extends AppCompatActivity implements DroidLi
     }
 
     private void setUp() {
-        saveBtn = findViewById(R.id.saveBtn);
+        saveBtn = findViewById(R.id.saveNewApptsB);
         mcodeET = findViewById(R.id.mcodeET);
         locationET = findViewById(R.id.locationET);
         startTimePicker = findViewById(R.id.start_time_p_id);
@@ -61,7 +61,9 @@ public class NewAppointmentActivity extends AppCompatActivity implements DroidLi
 
         dateET = findViewById(R.id.pickDateET);
         Calendar calendar = Calendar.getInstance();
-        String currentDateText = formatDate(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
+
+        //calendar.get(MONTH) -> returns int in [0,11]
+        String currentDateText = formatDate(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR));
         dateET.setText(currentDateText);
         dateET.setInputType(InputType.TYPE_NULL);
 
@@ -180,14 +182,13 @@ public class NewAppointmentActivity extends AppCompatActivity implements DroidLi
         dateET.setText(dateText);
     }
 
-    private String formatDate(int day, int month, int year) {
+    public String formatDate(int day, int month, int year) {
         StringBuilder date = new StringBuilder();
 
         String theDay = (day >= 1 && day <= 9) ? "0" + day : String.valueOf(day);
         date.append(theDay);
         date.append("/");
 
-        month++;
         String theMonth = (month >= 1 && month <= 9) ? "0" + month : String.valueOf(month);
         date.append(theMonth);
 
