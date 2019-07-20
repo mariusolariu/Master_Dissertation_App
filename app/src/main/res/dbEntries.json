@@ -34,7 +34,7 @@
       },
       "pastAppts": {
         "app1": {
-          "aptKey": "app1",
+          "apptKey": "app1",
           "date": "18/04/2019",
           "end_time": "21:30",
           "location": "Glasgow",
@@ -44,7 +44,7 @@
       },
       "progressAppts": {
         "app5": {
-          "aptKey": "app5",
+          "apptKey": "app5",
           "date": "19/05/2019",
           "end_time": "20:30",
           "location": "Paisley",

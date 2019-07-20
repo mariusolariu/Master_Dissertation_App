@@ -16,7 +16,8 @@
 
         <activity
             android:name=".ui.MainActivity"
-            android:theme="@style/NoBarTheme">
+            android:theme="@style/NoBarTheme"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <!-- The following action is required to get rid of Google Search warning -->

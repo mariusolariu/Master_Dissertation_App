@@ -17,6 +17,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -71,6 +72,9 @@ public class ConnectionFirebase {
                             listener.onProgressApptsChanged(new ArrayList<Appointment>());
                             break;
                         case UPCOMING_NODE:
+                            listener.onUpcomingApptsChanged(new ArrayList<Appointment>());
+                            break;
+                        case FEEDBACK_NODE:
                             listener.onUpcomingApptsChanged(new ArrayList<Appointment>());
                             break;
                         default:
@@ -276,7 +280,29 @@ public class ConnectionFirebase {
 
         FirebaseHelper.moveAppointment(databaseReference, userId, sourceAppointmentType, PAST_NODE, selectedAppt);
 
-        databaseReference.child(USERS_NODE).child(userId).child(NOT_FINISHED_NODE).child(selectedAppt.getApptKey()).setValue(reason);
+        //delete
+        databaseReference.child(ConnectionFirebase.USERS_NODE + "/" + userId + "/" + sourceAppointmentType)
+                .child(selectedAppt.getApptKey())
+                .setValue(null);
+
+        HashMap<String, Object> apptData = toMap(selectedAppt);
+        apptData.put("reason", reason);
+
+
+        databaseReference.child(USERS_NODE).child(userId).child(NOT_FINISHED_NODE).child(selectedAppt.getApptKey()).updateChildren(apptData);
+    }
+
+    private HashMap<String, Object> toMap(Appointment appt) {
+        HashMap<String, Object> result = new HashMap<>();
+
+        result.put("apptKey", appt.getApptKey());
+        result.put("date", appt.getDate());
+        result.put("end_time", appt.getEnd_time());
+        result.put("start_time", appt.getStart_time());
+        result.put("location", appt.getLocation());
+        result.put("m_code", appt.getM_code());
+
+        return result;
     }
 
     public void apptFeedbackProvided(Appointment selectedAppt, AppointmentState appointmentState, String[] answers) {
@@ -286,14 +312,23 @@ public class ConnectionFirebase {
         FirebaseHelper.moveAppointment(databaseReference, userId, sourceAppointmentType, PAST_NODE, selectedAppt);
 
         for (int i = 0; i < answers.length; i++) {
-            databaseReference.child(USERS_NODE).child(userId).child(FEEDBACK_COMPLETED_APPTS_NODE).child(apptKey).child("q" + (i + 1) + "_answer").setValue(answers[i]);
+            databaseReference.child(USERS_NODE)
+                    .child(userId)
+                    .child(FEEDBACK_COMPLETED_APPTS_NODE)
+                    .child(apptKey)
+                    .child("q" + (i + 1) + "_answer")
+                    .setValue(answers[i]);
         }
 
     }
 
     public void participantFdbkProvided(Appointment selectedAppt, String participantMessage) {
         String apptKey = selectedAppt.getApptKey();
-        databaseReference.child(USERS_NODE).child(userId).child(PARTICIPANT_FEEDBACK_NODE).child(apptKey).setValue(participantMessage);
+        databaseReference.child(USERS_NODE)
+                .child(userId)
+                .child(PARTICIPANT_FEEDBACK_NODE)
+                .child(apptKey)
+                .setValue(participantMessage);
     }
 
     private String toAppointmentNode(AppointmentState appointmentState) {
