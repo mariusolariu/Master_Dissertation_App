@@ -18,4 +18,6 @@ public interface AppointmentsListener {
     void onUserInfoChanged(UserInfo userInfo);
 
     void onManagerInfoChanged(ManagerInfo managerInfo);
+
+    void onFdbkQuestionsRetrieved(List<String> fdbkQuestions);
 }

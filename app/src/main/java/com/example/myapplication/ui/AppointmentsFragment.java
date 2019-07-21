@@ -19,6 +19,7 @@ import com.example.myapplication.util.AppointmentState;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.myapplication.ui.MainActivity.FEEDBACK_QUESTIONS_TAG;
 import static com.example.myapplication.ui.MainActivity.PROVID_FDBK_CODE;
 
 public class AppointmentsFragment extends Fragment implements AppointmentsListReceiver {
@@ -96,6 +97,13 @@ public class AppointmentsFragment extends Fragment implements AppointmentsListRe
                     mainActivity.setSelectedAppt(selectedAppt, fragmentType);
 
                     Intent intent = new Intent(mainActivity, ProvideFdbkActivity.class);
+                    Bundle bundle = new Bundle();
+                    List<String> fdbkQuestions = mainActivity.getFdbkQuestions();
+                    String[] questions = fdbkQuestions.toArray(new String[fdbkQuestions.size()]);
+
+                    bundle.putStringArray(FEEDBACK_QUESTIONS_TAG, questions);
+                    intent.putExtras(bundle);
+
                     //fragments can start activities too and they have their own onActivityResult()
                     mainActivity.startActivityForResult(intent, PROVID_FDBK_CODE);
                 }

@@ -36,6 +36,7 @@ public class ConnectionFirebase {
     private static final String PAST_NODE = "pastAppts";
     private static final String USER_NODE = "userInfo";
     private static final String MANAGER_NODE = "managerInfo";
+    private static final String FDBK_QUESTIONS_NODE = "fdbkQuestions";
     private static final String PARTICIPANT_FEEDBACK_NODE = "participantNode";
     private static final String FEEDBACK_COMPLETED_APPTS_NODE = "feedback_completed_appts";
 
@@ -237,6 +238,26 @@ public class ConnectionFirebase {
 
             }
         });
+
+        databaseReference.child(FDBK_QUESTIONS_NODE)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        ArrayList<String> fdbkQuestions = new ArrayList<>();
+                        Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+
+                        for (DataSnapshot child : children) {
+                            fdbkQuestions.add((String) child.getValue());
+                        }
+
+                        listener.onFdbkQuestionsRetrieved(fdbkQuestions);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
 
     }
 

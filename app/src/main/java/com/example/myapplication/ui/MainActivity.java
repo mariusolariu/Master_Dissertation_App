@@ -67,6 +67,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     final static String ANSWERS_ARRAY_CODE = "ANSWERS_ARRAY_CODE";
     final static String PARTICIPANT_FEEDBACK = "PARTICIPANT_FEEDBACK";
 
+
+    final static String FEEDBACK_QUESTIONS_TAG = "FEEDBACK_QUESTIONS";
+
     private static final int NEW_APPT_CODE = 100;
     static final int REQ_SIGN_IN = 101;
     private static final int REQ_SMS_PERMISSION = 102;
@@ -91,6 +94,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //updated whenever the user of the app is modified;
     private UserInfo userInfo;
     private ManagerInfo managerInfo;
+    private List<String> fdbkQuestions;
     //this gets initialized when the user long clicks an ListView item in fragment
     private Appointment selectedAppt;
     private AppointmentState appointmentState;
@@ -194,6 +198,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         checkForSmsPermission();
         createReasonAlertDialog();
 
+    }
+
+    public List<String> getFdbkQuestions() {
+        return fdbkQuestions;
     }
 
     private void createReasonAlertDialog() {
@@ -465,6 +473,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onChanged(@Nullable ManagerInfo managerInfo) {
                 MainActivity.this.managerInfo = managerInfo;
+            }
+        });
+
+        maModel.getFdbkQuestionsLD().observe(this, new Observer<List<String>>() {
+            @Override
+            public void onChanged(@Nullable List<String> fdbkQuestions) {
+                MainActivity.this.fdbkQuestions = fdbkQuestions;
             }
         });
     }

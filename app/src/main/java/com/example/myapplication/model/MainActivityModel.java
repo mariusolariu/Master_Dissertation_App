@@ -17,6 +17,7 @@ public class MainActivityModel extends ViewModel implements AppointmentsListener
     private MutableLiveData<List<Appointment>> pastAppts;
     private MutableLiveData<UserInfo> userInfoLD;
     private MutableLiveData<ManagerInfo> managerInfoLD;
+    private MutableLiveData<List<String>> fdbkQuestionsLD;
 
 
     private ConnectionFirebase connectionFirebase;
@@ -31,6 +32,7 @@ public class MainActivityModel extends ViewModel implements AppointmentsListener
         pastAppts = new MutableLiveData<>();
         userInfoLD = new MutableLiveData<>();
         managerInfoLD = new MutableLiveData<>();
+        fdbkQuestionsLD = new MutableLiveData<>();
 
         connectionFirebase = new ConnectionFirebase(this, userId);
     }
@@ -103,6 +105,15 @@ public class MainActivityModel extends ViewModel implements AppointmentsListener
     @Override
     public void onManagerInfoChanged(ManagerInfo managerInfo) {
         this.managerInfoLD.setValue(managerInfo);
+    }
+
+    public MutableLiveData<List<String>> getFdbkQuestionsLD() {
+        return fdbkQuestionsLD;
+    }
+
+    @Override
+    public void onFdbkQuestionsRetrieved(List<String> fdbkQuestions) {
+        this.fdbkQuestionsLD.setValue(fdbkQuestions);
     }
 
     //interract with Firebase to add new appointment
