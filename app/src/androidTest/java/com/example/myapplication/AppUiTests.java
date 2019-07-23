@@ -257,7 +257,7 @@ public class AppUiTests {
     private void inputCancelReason(String apptIdentifier) {
         onView(withText(apptIdentifier)).perform(longClick());
         onView(withId(R.id.prvidReasoB)).perform(click());
-        onView(withId(R.id.reasonNotCompletingApptET)).perform(typeText("It was raining outside"));
+        onView(withId(R.id.dialogET)).perform(typeText("It was raining outside"));
         onView(withText("OK")).perform(click());
     }
 

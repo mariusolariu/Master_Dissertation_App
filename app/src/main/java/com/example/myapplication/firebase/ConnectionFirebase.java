@@ -34,7 +34,7 @@ public class ConnectionFirebase {
     static final String FEEDBACK_NODE = "feedbackAppts";
     private static final String NOT_FINISHED_NODE = "notFinishedAppts";
     private static final String PAST_NODE = "pastAppts";
-    private static final String USER_NODE = "userInfo";
+    private static final String USER_INFO_NODE = "userInfo";
     private static final String MANAGER_NODE = "managerInfo";
     private static final String FDBK_QUESTIONS_NODE = "fdbkQuestions";
     private static final String PARTICIPANT_FEEDBACK_NODE = "participantNode";
@@ -79,7 +79,7 @@ public class ConnectionFirebase {
                             listener.onUpcomingApptsChanged(new ArrayList<Appointment>());
                             break;
                         default:
-                            Log.i(MainActivity.YMCA_TAG, "Not a valid case. Check ConnectionFirebase class");
+                            Log.i(MainActivity.APP_TAG, "Not a valid case. Check ConnectionFirebase class");
                     }
                 }
 
@@ -119,6 +119,11 @@ public class ConnectionFirebase {
                     }
 
                     listener.onProgressApptsChanged(appointments);
+                } else {
+                    //gets to this part when the data at the requested path doesn't exist (e.g. all the upcoming apps are finished or you switch from an account with many entries in this categories to one which has none)
+                    Log.i(MainActivity.APP_TAG, "Data at requested path doesn't exits: " + PROGRESS_NODE);
+                    //required in order to clear the data in ui for the case when switching from one account to another
+                    listener.onProgressApptsChanged(new ArrayList<Appointment>());
                 }
             }
 
@@ -147,12 +152,17 @@ public class ConnectionFirebase {
                     }
 
                     listener.onUpcomingApptsChanged(appointments);
+                } else {
+                    //gets to this part when the data at the requested path doesn't exist (e.g. all the upcoming apps are finished or you switch from an account with many entries in this categories to one which has none)
+                    Log.i(MainActivity.APP_TAG, "Data at requested path doesn't exits: " + UPCOMING_NODE);
+                    //required in order to clear the data in ui for the case when switching from one account to another
+                    listener.onUpcomingApptsChanged(new ArrayList<Appointment>());
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                Log.e(MainActivity.APP_TAG, "Failed at the server");
             }
         });
 
@@ -174,6 +184,11 @@ public class ConnectionFirebase {
                     }
 
                     listener.onFeedbackApptsChanged(appointments);
+                } else {
+                    //gets to this part when the data at the requested path doesn't exist (e.g. all the upcoming apps are finished or you switch from an account with many entries in this categories to one which has none)
+                    Log.i(MainActivity.APP_TAG, "Data at requested path doesn't exits: " + FEEDBACK_NODE);
+                    //required in order to clear the data in ui for the case when switching from one account to another
+                    listener.onFeedbackApptsChanged(new ArrayList<Appointment>());
                 }
             }
 
@@ -183,8 +198,8 @@ public class ConnectionFirebase {
             }
         });
 
-
-        databaseReference.child(USERS_NODE).child(userId).child(PAST_NODE).orderByKey().limitToFirst(PAST_APPTS_RETURNED_SIZE).addValueEventListener(new ValueEventListener() {
+        //display only most recent apps
+        databaseReference.child(USERS_NODE).child(userId).child(PAST_NODE).orderByKey().limitToLast(PAST_APPTS_RETURNED_SIZE).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -202,6 +217,11 @@ public class ConnectionFirebase {
                     }
 
                     listener.onPastApptsChanged(appointments);
+                } else {
+                    //gets to this part when the data at the requested path doesn't exist (e.g. all the upcoming apps are finished or you switch from an account with many entries in this categories to one which has none)
+                    Log.i(MainActivity.APP_TAG, "Data at requested path doesn't exits: " + PAST_NODE);
+//                    //required in order to clear the data in ui for the case when switching from one account to another
+                    listener.onPastApptsChanged(new ArrayList<Appointment>());
                 }
             }
 
@@ -211,7 +231,7 @@ public class ConnectionFirebase {
             }
         });
 
-        databaseReference.child(USERS_NODE).child(userId).child(USER_NODE).addValueEventListener(new ValueEventListener() {
+        databaseReference.child(USERS_NODE).child(userId).child(USER_INFO_NODE).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 UserInfo userInfo = dataSnapshot.getValue(UserInfo.class);
@@ -301,15 +321,10 @@ public class ConnectionFirebase {
 
         FirebaseHelper.moveAppointment(databaseReference, userId, sourceAppointmentType, PAST_NODE, selectedAppt);
 
-        //delete
-        databaseReference.child(ConnectionFirebase.USERS_NODE + "/" + userId + "/" + sourceAppointmentType)
-                .child(selectedAppt.getApptKey())
-                .setValue(null);
-
         HashMap<String, Object> apptData = toMap(selectedAppt);
         apptData.put("reason", reason);
 
-
+        //added to be easier on server side, although is quite rendundant (store the data twice)
         databaseReference.child(USERS_NODE).child(userId).child(NOT_FINISHED_NODE).child(selectedAppt.getApptKey()).updateChildren(apptData);
     }
 
@@ -366,10 +381,17 @@ public class ConnectionFirebase {
                 appointmentNode = FEEDBACK_NODE;
                 break;
             default:
-                Log.i(MainActivity.YMCA_TAG, "Invalid appointment state:  " + appointmentState.toString());
+                Log.i(MainActivity.APP_TAG, "Invalid appointment state:  " + appointmentState.toString());
         }
 
         return appointmentNode;
     }
 
+    public void saveNewUserName(String textValue) {
+        databaseReference.child(USERS_NODE + "/" + userId)
+                .child(USER_INFO_NODE)
+                .child("user_name")
+                .setValue(textValue);
+
+    }
 }

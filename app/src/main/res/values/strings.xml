@@ -35,6 +35,7 @@
     <string name="header_email_text">username@ymca.com</string>
     <string name="edit_appointment_butt_text">Edit appointment button</string>
     <string name="reason_for_not_completing_appt">Reason for not completing appt</string>
+    <string name="provide_name_title">Provide your name please!</string>
     <string name="title_reason_dialog">Provide reason for canceling!</string>
     <string name="feedback_activ">Provide Feedback</string>
     <string name="reason_cancelling_appt">It was raining…</string>

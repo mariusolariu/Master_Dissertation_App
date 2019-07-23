@@ -13,7 +13,7 @@ import com.droidnet.DroidListener;
 import com.droidnet.DroidNet;
 import com.example.myapplication.R;
 
-import static com.example.myapplication.util.EditTextHelper.emptyET;
+import static com.example.myapplication.util.EditTextHelper.isET_empty;
 
 public class SignUpActivity extends AppCompatActivity implements DroidListener {
     public static final String EMAIL_TAG = "email";
@@ -44,13 +44,13 @@ public class SignUpActivity extends AppCompatActivity implements DroidListener {
             public void onClick(View view) {
                 String emailText = emailET.getText().toString();
 
-                if (emptyET(emailET, emailText, "Please fill in the email address!")) {
+                if (isET_empty(emailET, emailText, "Please fill in the email address!")) {
                     return;
                 }
 
                 String passwordText = passwordET.getText().toString();
 
-                if (emptyET(passwordET, passwordText, "Please fill in the password!")) {
+                if (isET_empty(passwordET, passwordText, "Please fill in the password!")) {
                     return;
                 }
 

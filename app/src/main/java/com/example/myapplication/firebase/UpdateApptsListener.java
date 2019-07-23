@@ -117,7 +117,7 @@ public class UpdateApptsListener implements ValueEventListener {
             d1 = dateFormat.parse(date + " " + time);
             result = d1.getTime();
         } catch (ParseException e) {
-            Log.e(MainActivity.YMCA_TAG, "Failed to convert date and time into Date object");
+            Log.e(MainActivity.APP_TAG, "Failed to convert date and time into Date object");
             e.printStackTrace();
         }
 

@@ -68,7 +68,7 @@ public class InternetDialogHelper {
                             appContext.startActivity(wifiIntent);
                         } catch (ActivityNotFoundException e) {
                             e.printStackTrace();
-                            Log.v(MainActivity.YMCA_TAG, "Wifi Settings activity is not present");
+                            Log.v(MainActivity.APP_TAG, "Wifi Settings activity is not present");
                         }
 
                         break;
@@ -80,7 +80,7 @@ public class InternetDialogHelper {
                             appContext.startActivity(dataUsageI);
                         } catch (ActivityNotFoundException e) {
                             e.printStackTrace();
-                            Log.v(MainActivity.YMCA_TAG, "Data settings usage activity is not present");
+                            Log.v(MainActivity.APP_TAG, "Data settings usage activity is not present");
                         }
                         break;
                 }

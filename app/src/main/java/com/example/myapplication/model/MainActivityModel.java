@@ -161,4 +161,8 @@ public class MainActivityModel extends ViewModel implements AppointmentsListener
             }
         }).start();
     }
+
+    public void saveNewUserName(String textValue) {
+        connectionFirebase.saveNewUserName(textValue);
+    }
 }

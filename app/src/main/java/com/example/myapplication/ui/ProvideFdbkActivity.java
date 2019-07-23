@@ -122,7 +122,7 @@ public class ProvideFdbkActivity extends AppCompatActivity implements DroidListe
                 for (int i = 0; i < answers.length; i++) {
                     answers[i] = answersET[i].getText().toString();
 
-                    if (EditTextHelper.emptyET(answersET[i], answers[i], ANSWER_NOT_FILLED_MESSAGE))
+                    if (EditTextHelper.isET_empty(answersET[i], answers[i], ANSWER_NOT_FILLED_MESSAGE))
                         return;
 
                 }

@@ -5,11 +5,10 @@
     android:orientation="vertical">
 
     <EditText
-        android:id="@+id/reasonNotCompletingApptET"
+        android:id="@+id/dialogET"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:inputType="text"
-        android:hint="@string/reason_cancelling_appt"
         android:importantForAutofill="no" />
 
 </LinearLayout>

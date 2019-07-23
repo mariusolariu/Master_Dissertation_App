@@ -43,6 +43,7 @@ import com.example.myapplication.model.MainActivityModel;
 import com.example.myapplication.model.ManagerInfo;
 import com.example.myapplication.model.UserInfo;
 import com.example.myapplication.util.AppointmentState;
+import com.example.myapplication.util.EditTextHelper;
 import com.example.myapplication.util.InternetDialogHelper;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -62,7 +63,7 @@ import java.util.List;
 //      * provide feedback for an appointment and see if they are are moved to past appoinments
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, DroidListener {
-    public static final String YMCA_TAG = "Ymca_Paisley";
+    public static final String APP_TAG = "Booking_App";
     final static String EDIT_APPOINTMENT = "EDIT_APPOINTMENT";
     final static String ANSWERS_ARRAY_CODE = "ANSWERS_ARRAY_CODE";
     final static String PARTICIPANT_FEEDBACK = "PARTICIPANT_FEEDBACK";
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TextView userEmailTV;
     private View headerLayout;
     private AlertDialog reasonAlertDialog;
+    private AlertDialog usernameAlertDialog;
 
     private MainActivityModel maModel;
     private List<Fragment> fragments;
@@ -98,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //this gets initialized when the user long clicks an ListView item in fragment
     private Appointment selectedAppt;
     private AppointmentState appointmentState;
+    private boolean listenerWasntAttached = true;
 
 
     private static final int PROGRESS_FRAG_INDEX = 0;
@@ -121,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DroidNet.init(this);
         DroidNet.getInstance().addInternetConnectivityListener(this);
 
+
         FirebaseApp.initializeApp(this);
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -131,7 +135,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 if ((currentUser != null) /*&& (currentUser.isEmailVerified())*/) {                    //user is signed in
 //                    Toast.makeText(MainActivity.this, "Successful sign in!", Toast.LENGTH_SHORT).show();
-                    currentUser.isEmailVerified();
                     String userId = currentUser.getUid();
                     setUpApp(userId);
                 } else {
@@ -196,24 +199,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         addUI_Listeners();
         updateUserInfo();
         checkForSmsPermission();
-        createReasonAlertDialog();
 
+        createAlertDialog(R.string.provide_name_title, AlertDialogType.USER_NAME);
+        createAlertDialog(R.string.title_reason_dialog, AlertDialogType.REASON_AD);
     }
 
     public List<String> getFdbkQuestions() {
         return fdbkQuestions;
     }
 
-    private void createReasonAlertDialog() {
+    private void createAlertDialog(int titleResource, final AlertDialogType dialogType) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         LayoutInflater layoutInflater = this.getLayoutInflater();
 
-        final View inflatedView = layoutInflater.inflate(R.layout.reason_layout, null);
+        final View inflatedView = layoutInflater.inflate(R.layout.alert_dialog_layout, null);
 
         builder.setView(inflatedView);
 
-        builder.setTitle(R.string.title_reason_dialog);
+        builder.setTitle(titleResource);
 
         //doesn't allow the dialog to be canceled when user touches an area that is outside the dialog
         builder.setCancelable(false);
@@ -222,33 +226,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         builder.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                EditText reasonET = reasonAlertDialog.findViewById(R.id.reasonNotCompletingApptET);
-                String reason = reasonET.getText().toString();
-                maModel.createNotFinishedAppt(selectedAppt, appointmentState, reason);
 
-                selectedAppt = null;
-                appointmentState = null;
-                invalidateOptionsMenu();
-
-                reasonET.setText("");
             }
         });
 
+        if (AlertDialogType.REASON_AD == dialogType) {
+            builder.setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    //make Toolbar buttons disappear
+//                    dialogInterface.dismiss();
 
-        builder.setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //make Toolbar buttons disappear
-                dialogInterface.dismiss();
+                    selectedAppt = null;
+                    appointmentState = null;
+                    invalidateOptionsMenu();
+                }
+            });
+        }
 
-                selectedAppt = null;
-                appointmentState = null;
-                invalidateOptionsMenu();
-            }
-        });
+        if (dialogType == AlertDialogType.REASON_AD) {
+            reasonAlertDialog = builder.create();
 
-        reasonAlertDialog = builder.create();
+        } else {
+            usernameAlertDialog = builder.create();
 
+
+        }
     }
 
     private void updateUserInfo() {
@@ -401,7 +404,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 invalidateOptionsMenu();
 
             default:
-                Log.i(YMCA_TAG, "Invalid code, no activity with this code was launched: " + requestCode);
+                Log.i(APP_TAG, "Invalid code, no activity with this code was launched: " + requestCode);
 
         }
     }
@@ -463,9 +466,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         maModel.getUserInfoLD().observe(this, new Observer<UserInfo>() {
             @Override
-            public void onChanged(@Nullable UserInfo userInfo) {
-                MainActivity.this.userInfo = userInfo;
-                updateUserInfo();
+            public void onChanged(@Nullable final UserInfo userInfo) {
+                if (userInfo.user_name == null) { // first login for the user, ask for his name
+                    usernameAlertDialog.show();
+
+                    usernameAlertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            EditText editText;
+
+                            editText = usernameAlertDialog.findViewById(R.id.dialogET);
+
+                            String textValue = editText.getText().toString();
+
+                            if (EditTextHelper.isET_empty(editText, textValue, "Please fill in information!")) {
+                                return;
+                            }
+
+                            maModel.saveNewUserName(textValue);
+                            MainActivity.this.userInfo = userInfo;
+                            updateUserInfo();
+
+
+                            editText.setText("");
+                            usernameAlertDialog.dismiss();
+                        }
+                    });
+
+                } else {
+                    MainActivity.this.userInfo = userInfo;
+                    updateUserInfo();
+                }
             }
         });
 
@@ -483,6 +514,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -529,6 +561,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             case R.id.prvidReasoB:
                 reasonAlertDialog.show();
+
+                if (listenerWasntAttached) {
+                    reasonAlertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            EditText editText;
+
+                            editText = reasonAlertDialog.findViewById(R.id.dialogET);
+
+                            String textValue = editText.getText().toString();
+
+                            if (EditTextHelper.isET_empty(editText, textValue, "Please fill in information!")) {
+                                return;
+                            }
+
+                            maModel.createNotFinishedAppt(selectedAppt, appointmentState, textValue);
+                            selectedAppt = null;
+                            appointmentState = null;
+                            invalidateOptionsMenu();
+
+
+                            editText.setText("");
+                            reasonAlertDialog.dismiss();
+                        }
+                    });
+
+                    listenerWasntAttached = false;
+                }
+
                 return true;
 
             case R.id.participantFeedReasB:
@@ -749,6 +810,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onDestroy() {
         super.onDestroy();
         firebaseAuth.removeAuthStateListener(authStateListener);
-//        Log.i(YMCA_TAG, "onDestroy called");
+//        Log.i(APP_TAG, "onDestroy called");
     }
 }

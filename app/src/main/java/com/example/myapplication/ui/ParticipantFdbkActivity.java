@@ -72,7 +72,7 @@ public class ParticipantFdbkActivity extends AppCompatActivity implements DroidL
             public void onClick(View view) {
                 String participantMessage = participantMessET.getText().toString();
 
-                if (EditTextHelper.emptyET(participantMessET, participantMessage, "Provide feedback about meeting...")) {
+                if (EditTextHelper.isET_empty(participantMessET, participantMessage, "Provide feedback about meeting...")) {
                     return;
                 }
 

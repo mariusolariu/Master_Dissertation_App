@@ -56,7 +56,7 @@ public class AppointmentsFragment extends Fragment implements AppointmentsListRe
      */
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-//    Log.i(MainActivity.YMCA_TAG, "onCreateView called " + fragmentType);
+//    Log.i(MainActivity.APP_TAG, "onCreateView called " + fragmentType);
         View view = inflater.inflate(R.layout.fragment_layout, container, false);
 
         progressAppsLV = view.findViewById(R.id.apptsLV);
@@ -99,7 +99,7 @@ public class AppointmentsFragment extends Fragment implements AppointmentsListRe
                     Intent intent = new Intent(mainActivity, ProvideFdbkActivity.class);
                     Bundle bundle = new Bundle();
                     List<String> fdbkQuestions = mainActivity.getFdbkQuestions();
-                    String[] questions = fdbkQuestions.toArray(new String[fdbkQuestions.size()]);
+                    String[] questions = fdbkQuestions.toArray(new String[0]);
 
                     bundle.putStringArray(FEEDBACK_QUESTIONS_TAG, questions);
                     intent.putExtras(bundle);
@@ -136,7 +136,7 @@ public class AppointmentsFragment extends Fragment implements AppointmentsListRe
                 ((upToDateAppointments.size() != cachedApptsSize) ||
                         !upToDateAppointments.equals(appointmentList))) {
 
-//            Log.i(MainActivity.YMCA_TAG, "appt list changed for " + fragmentType);
+//            Log.i(MainActivity.APP_TAG, "appt list changed for " + fragmentType);
 
             //maybe run the next two instructions on a separate thread
             appointmentList.clear();
@@ -145,7 +145,7 @@ public class AppointmentsFragment extends Fragment implements AppointmentsListRe
         }
 
 
-//    Log.i(MainActivity.YMCA_TAG, "onResume called for " + fragmentType);
+//    Log.i(MainActivity.APP_TAG, "onResume called for " + fragmentType);
     }
 
     /**
@@ -154,14 +154,14 @@ public class AppointmentsFragment extends Fragment implements AppointmentsListRe
     @Override
     public void onPause() {
         super.onPause();
-//    Log.i(MainActivity.YMCA_TAG, "onPause called for " + fragmentType);
+//    Log.i(MainActivity.APP_TAG, "onPause called for " + fragmentType);
 
     }
 
     @Override
     public void onStop() {
         super.onStop();
-//    Log.i(MainActivity.YMCA_TAG, "onStop called for " + fragmentType);
+//    Log.i(MainActivity.APP_TAG, "onStop called for " + fragmentType);
     }
 
     @Override

@@ -20,7 +20,7 @@ import com.example.myapplication.model.Appointment;
 
 import java.util.Calendar;
 
-import static com.example.myapplication.util.EditTextHelper.emptyET;
+import static com.example.myapplication.util.EditTextHelper.isET_empty;
 
 /**
  * Allows the user to input all the details needed for creating a new appointment and the passes them back to the MainActivity which in turn passes them to the model
@@ -126,13 +126,13 @@ public class NewAppointmentActivity extends AppCompatActivity implements DroidLi
             public void onClick(View view) {
                 String menteeCode = mcodeET.getText().toString();
 
-                if (emptyET(mcodeET, menteeCode, "Please provide mentee code")) {
+                if (isET_empty(mcodeET, menteeCode, "Please provide mentee code")) {
                     return;
                 }
 
                 String location = locationET.getText().toString();
 
-                if (emptyET(locationET, location, "Please provide location")) {
+                if (isET_empty(locationET, location, "Please provide location")) {
                     return;
                 }
 
