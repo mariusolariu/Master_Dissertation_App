@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">YMCA Paisley</string>
+    <string name="app_name">PlusOne Mentor App</string>
     <string name="Open">Open navigation Drawer</string>
     <string name="Close">Close navigation drawer</string>
     <string name="sign_out_message">Sign out</string>
@@ -32,7 +32,7 @@
     <string name="time_location_icon_cd">Time location icon</string>
     <string name="save_btn_text">Save</string>
     <string name="forename_surname_text">Forename Surname</string>
-    <string name="header_email_text">username@ymca.com</string>
+    <string name="header_email_text">username@gmail.com</string>
     <string name="edit_appointment_butt_text">Edit appointment button</string>
     <string name="reason_for_not_completing_appt">Reason for not completing appt</string>
     <string name="provide_name_title">Provide your name please!</string>
