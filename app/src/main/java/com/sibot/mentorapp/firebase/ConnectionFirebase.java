@@ -317,7 +317,12 @@ public class ConnectionFirebase {
     public void createNotFinishedAppt(Appointment selectedAppt, AppointmentState appointmentState, String reason) {
         String sourceAppointmentType = appointmentState.equals(AppointmentState.PROGRESS) ? PROGRESS_NODE : UPCOMING_NODE;
 
-        FirebaseHelper.moveAppointment(databaseReference, userId, sourceAppointmentType, PAST_NODE, selectedAppt);
+        //delete old node
+        databaseReference.child(USERS_NODE)
+                .child(userId)
+                .child(sourceAppointmentType)
+                .child(selectedAppt.getApptKey())
+                .setValue(null);
 
         HashMap<String, Object> apptData = toMap(selectedAppt);
         apptData.put("reason", reason);
