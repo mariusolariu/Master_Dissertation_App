@@ -20,7 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 
 //logic for interacting with the firebase database
-public class ConnectionFirebase {
+public class FirebaseConnection {
     private static final int PAST_APPTS_RETURNED_SIZE = 15;
     private final DatabaseReference databaseReference;
     private final AppointmentsListener listener;
@@ -38,7 +38,7 @@ public class ConnectionFirebase {
     private static final String PARTICIPANT_FEEDBACK_NODE = "participantNode";
     private static final String FEEDBACK_COMPLETED_APPTS_NODE = "feedback_completed_appts";
 
-    public ConnectionFirebase(AppointmentsListener listener, String userId) {
+    public FirebaseConnection(AppointmentsListener listener, String userId) {
         databaseReference = FirebaseDatabase.getInstance().getReference();
         this.listener = listener;
         this.userId = userId;
@@ -77,7 +77,7 @@ public class ConnectionFirebase {
                             listener.onUpcomingApptsChanged(new ArrayList<Appointment>());
                             break;
                         default:
-//                            Log.i(MainActivity.APP_TAG, "Not a valid case. Check ConnectionFirebase class");
+//                            Log.i(MainActivity.APP_TAG, "Not a valid case. Check FirebaseConnection class");
                     }
                 }
 

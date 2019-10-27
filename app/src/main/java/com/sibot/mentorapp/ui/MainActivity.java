@@ -45,9 +45,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.sibot.mentorapp.R;
 import com.sibot.mentorapp.model.Appointment;
-import com.sibot.mentorapp.model.MainActivityModel;
 import com.sibot.mentorapp.model.ManagerInfo;
 import com.sibot.mentorapp.model.UserInfo;
+import com.sibot.mentorapp.model.ViewModelMA;
 import com.sibot.mentorapp.util.AppointmentState;
 import com.sibot.mentorapp.util.EditTextHelper;
 import com.sibot.mentorapp.util.InternetDialogHelper;
@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private AlertDialog reasonAlertDialog;
     private AlertDialog usernameAlertDialog;
 
-    private MainActivityModel maModel;
+    private ViewModelMA maModel;
     private List<Fragment> fragments;
 
     private boolean smsPermissionGranted;
@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //needs to be initialized to handle correctly a configuration change
         try {
-            maModel = ViewModelProviders.of(this).get(MainActivityModel.class);
+            maModel = ViewModelProviders.of(this).get(ViewModelMA.class);
         } catch (IllegalStateException e) {
             Toast.makeText(this, "Error initialising the model!", Toast.LENGTH_SHORT).show();
             e.printStackTrace();

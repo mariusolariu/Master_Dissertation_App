@@ -14,9 +14,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import static com.sibot.mentorapp.firebase.ConnectionFirebase.FEEDBACK_NODE;
-import static com.sibot.mentorapp.firebase.ConnectionFirebase.PROGRESS_NODE;
-import static com.sibot.mentorapp.firebase.ConnectionFirebase.UPCOMING_NODE;
+import static com.sibot.mentorapp.firebase.FirebaseConnection.FEEDBACK_NODE;
+import static com.sibot.mentorapp.firebase.FirebaseConnection.PROGRESS_NODE;
+import static com.sibot.mentorapp.firebase.FirebaseConnection.UPCOMING_NODE;
 
 
 /**
@@ -25,10 +25,10 @@ import static com.sibot.mentorapp.firebase.ConnectionFirebase.UPCOMING_NODE;
 public class UpdateApptsListener implements ValueEventListener {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.UK);
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-    private final ConnectionFirebase owner;
+    private final FirebaseConnection owner;
     private final String userID;
 
-    UpdateApptsListener(ConnectionFirebase owner, String userId) {
+    UpdateApptsListener(FirebaseConnection owner, String userId) {
         this.owner = owner;
         this.userID = userId;
     }

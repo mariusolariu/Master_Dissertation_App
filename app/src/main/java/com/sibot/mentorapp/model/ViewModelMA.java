@@ -5,12 +5,12 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
 import com.sibot.mentorapp.firebase.AppointmentsListener;
-import com.sibot.mentorapp.firebase.ConnectionFirebase;
+import com.sibot.mentorapp.firebase.FirebaseConnection;
 import com.sibot.mentorapp.util.AppointmentState;
 
 import java.util.List;
 
-public class MainActivityModel extends ViewModel implements AppointmentsListener {
+public class ViewModelMA extends ViewModel implements AppointmentsListener {
     private MutableLiveData<List<Appointment>> progressAppts;
     private MutableLiveData<List<Appointment>> upcomingAppts;
     private MutableLiveData<List<Appointment>> feedbackAppts;
@@ -20,7 +20,7 @@ public class MainActivityModel extends ViewModel implements AppointmentsListener
     private MutableLiveData<List<String>> fdbkQuestionsLD;
 
 
-    private ConnectionFirebase connectionFirebase;
+    private FirebaseConnection firebaseConnection;
 
 
     public void init(String userId) {
@@ -34,7 +34,7 @@ public class MainActivityModel extends ViewModel implements AppointmentsListener
         managerInfoLD = new MutableLiveData<>();
         fdbkQuestionsLD = new MutableLiveData<>();
 
-        connectionFirebase = new ConnectionFirebase(this, userId);
+        firebaseConnection = new FirebaseConnection(this, userId);
     }
 
     public MutableLiveData<ManagerInfo> getManagerInfoLD() {
@@ -118,13 +118,13 @@ public class MainActivityModel extends ViewModel implements AppointmentsListener
 
     //interract with Firebase to add new appointment
     public void addAppointment(Appointment newA) {
-        connectionFirebase.addAppointment(newA);
+        firebaseConnection.addAppointment(newA);
     }
 
     //interract with Firebase to remove appointment
     //Should they be allowed to do it?
     public void removeAppointmnet(Appointment x, AppointmentState appointmentState) {
-        connectionFirebase.removeAppointment(x, appointmentState);
+        firebaseConnection.removeAppointment(x, appointmentState);
     }
 
     @Override
@@ -137,7 +137,7 @@ public class MainActivityModel extends ViewModel implements AppointmentsListener
      * move appointment to past appts and add a reason for not executing it
      */
     public void createNotFinishedAppt(Appointment selectedAppt, AppointmentState appointmentState, String reason) {
-        connectionFirebase.createNotFinishedAppt(selectedAppt, appointmentState, reason);
+        firebaseConnection.createNotFinishedAppt(selectedAppt, appointmentState, reason);
     }
 
     /**
@@ -147,7 +147,7 @@ public class MainActivityModel extends ViewModel implements AppointmentsListener
         new Thread(new Runnable() {
             @Override
             public void run() {
-                connectionFirebase.apptFeedbackProvided(selectedAppt, appointmentState, answers);
+                firebaseConnection.apptFeedbackProvided(selectedAppt, appointmentState, answers);
             }
         }).start();
 
@@ -157,12 +157,12 @@ public class MainActivityModel extends ViewModel implements AppointmentsListener
         new Thread(new Runnable() {
             @Override
             public void run() {
-                connectionFirebase.participantFdbkProvided(selectedAppt, participantMessage);
+                firebaseConnection.participantFdbkProvided(selectedAppt, participantMessage);
             }
         }).start();
     }
 
     public void saveNewUserName(String textValue) {
-        connectionFirebase.saveNewUserName(textValue);
+        firebaseConnection.saveNewUserName(textValue);
     }
 }
