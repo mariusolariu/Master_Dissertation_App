@@ -1,0 +1,56 @@
+{
+  "comment": "keep the structure as flat as possible. i.e. make appointments feedback a different node. feedbackProvided can be boolean. time and date can be arrays",
+  "fdbkQuestions": {
+    "q1": "How was the atmosphere in the home/with the family?",
+    "q2": "How did the activity go?",
+    "q3": "How do you feel the young person is progressing?",
+    "q4": "Is there anything that the young person feels they need to improve on?",
+    "q5": "Any other comments?"
+  },
+  "managerInfo": {
+    "m_phone_no": "",
+    "manager_name": ""
+  },
+  "possibleCateg": [
+    "progressAppts",
+    "upcomingAppts",
+    "feebackAppts",
+    "pastAppts",
+    "notFinishedAppts"
+  ],
+  "users": {
+    "rqByrWC2avUlLbfyQxx61PhpZex1": {
+      "feedback_completed_appts": {
+        "-LlsHqjskRYB3ILru270": {
+          "q1_answer": "brilliant ",
+          "q2_answer": "Very well ",
+          "q3_answer": "very well ",
+          "q4_answer": "None ",
+          "q5_answer": "none"
+        }
+      },
+      "pastAppts": {
+        "-Lla94OxTi2U34b5Ncyf": {
+          "apptKey": "-Lla94OxTi2U34b5Ncyf",
+          "date": "07/07/2019",
+          "end_time": "14:30",
+          "location": "12 Byers Road, Glasgow ",
+          "m_code": "kat341",
+          "start_time": "12:00"
+        },
+        "-LlsHqjskRYB3ILru270": {
+          "apptKey": "-LlsHqjskRYB3ILru270",
+          "date": "12/07/2019",
+          "end_time": "14:30",
+          "location": "12 Arygle Street Glasgow ",
+          "m_code": "kat341",
+          "start_time": "12:30"
+        }
+      },
+      "userInfo": {
+        "admin": false,
+        "user_name": "Katy "
+      }
+    }
+  }
+}
