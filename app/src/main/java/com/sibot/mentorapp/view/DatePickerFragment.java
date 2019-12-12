@@ -1,4 +1,4 @@
-package com.sibot.mentorapp.ui;
+package com.sibot.mentorapp.view;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;

@@ -1,11 +1,14 @@
-package com.sibot.mentorapp.model;
+package com.sibot.mentorapp.model_view;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
-import com.sibot.mentorapp.firebase.AppointmentsListener;
-import com.sibot.mentorapp.firebase.FirebaseConnection;
+import com.sibot.mentorapp.model.Appointment;
+import com.sibot.mentorapp.model.AppointmentsListener;
+import com.sibot.mentorapp.model.FirebaseConnection;
+import com.sibot.mentorapp.model.ManagerInfo;
+import com.sibot.mentorapp.model.UserInfo;
 import com.sibot.mentorapp.util.AppointmentState;
 
 import java.util.List;

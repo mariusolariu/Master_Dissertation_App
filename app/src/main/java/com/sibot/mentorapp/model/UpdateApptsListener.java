@@ -1,4 +1,4 @@
-package com.sibot.mentorapp.firebase;
+package com.sibot.mentorapp.model;
 
 import android.support.annotation.NonNull;
 
@@ -7,16 +7,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.sibot.mentorapp.model.Appointment;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import static com.sibot.mentorapp.firebase.FirebaseConnection.FEEDBACK_NODE;
-import static com.sibot.mentorapp.firebase.FirebaseConnection.PROGRESS_NODE;
-import static com.sibot.mentorapp.firebase.FirebaseConnection.UPCOMING_NODE;
+import static com.sibot.mentorapp.model.FirebaseConnection.FEEDBACK_NODE;
+import static com.sibot.mentorapp.model.FirebaseConnection.PROGRESS_NODE;
+import static com.sibot.mentorapp.model.FirebaseConnection.UPCOMING_NODE;
 
 
 /**
@@ -50,9 +49,7 @@ public class UpdateApptsListener implements ValueEventListener {
     }
 
     /**
-     * Depending on the current time (when the app was opened) move upcoming appointments in db to progress or feedback section
-     *
-     *
+     * Depending on the current time (when the app was opened) move Upcoming appointments to Progress or Feedback section
      */
     private void updateUpcomingAppts(Iterable<DataSnapshot> dataSnapshots) {
         long currentTime = System.currentTimeMillis();

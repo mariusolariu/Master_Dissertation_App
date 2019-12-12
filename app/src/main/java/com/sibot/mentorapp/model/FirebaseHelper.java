@@ -1,7 +1,6 @@
-package com.sibot.mentorapp.firebase;
+package com.sibot.mentorapp.model;
 
 import com.google.firebase.database.DatabaseReference;
-import com.sibot.mentorapp.model.Appointment;
 
 class FirebaseHelper {
     static void moveAppointment(DatabaseReference databaseReference, String userID, String sourceCategory, String destinationCategory, Appointment a) {

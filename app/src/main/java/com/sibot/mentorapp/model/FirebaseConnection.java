@@ -1,4 +1,4 @@
-package com.sibot.mentorapp.firebase;
+package com.sibot.mentorapp.model;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,9 +9,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.sibot.mentorapp.model.Appointment;
-import com.sibot.mentorapp.model.ManagerInfo;
-import com.sibot.mentorapp.model.UserInfo;
 import com.sibot.mentorapp.util.AppointmentState;
 
 import java.util.ArrayList;
@@ -290,19 +287,19 @@ public class FirebaseConnection {
 
     }
 
-    public void addAppointment(Appointment appt) {
+    public void addAppointment(Appointment newAppt) {
         //push() generates a key that takes into account the timestamp, so the list elements can be sorted chronologically
-        databaseReference.child(USERS_NODE).child(userId).child(UPCOMING_NODE).push().setValue(appt);
+        databaseReference.child(USERS_NODE).child(userId).child(UPCOMING_NODE).push().setValue(newAppt);
     }
 
 
     /* Called when an appointment needs to be edited; first I delete the old one and create a new one
      */
-    public void removeAppointment(Appointment x, AppointmentState appointmentState) {
+    public void removeAppointment(Appointment appt, AppointmentState apptState) {
         //TOBE MODIFIED
-        String key = x.getApptKey();
+        String key = appt.getApptKey();
 
-        switch (appointmentState) {
+        switch (apptState) {
             case PROGRESS:
                 databaseReference.child(USERS_NODE).child(userId).child(PROGRESS_NODE).child(key).setValue(null);
                 break;

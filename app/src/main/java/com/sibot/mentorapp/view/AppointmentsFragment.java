@@ -1,4 +1,4 @@
-package com.sibot.mentorapp.ui;
+package com.sibot.mentorapp.view;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,8 +19,8 @@ import com.sibot.mentorapp.util.AppointmentState;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.sibot.mentorapp.ui.MainActivity.FEEDBACK_QUESTIONS_TAG;
-import static com.sibot.mentorapp.ui.MainActivity.PROVID_FDBK_CODE;
+import static com.sibot.mentorapp.view.MainActivity.FEEDBACK_QUESTIONS_TAG;
+import static com.sibot.mentorapp.view.MainActivity.PROVID_FDBK_CODE;
 
 public class AppointmentsFragment extends Fragment implements AppointmentsListReceiver {
 

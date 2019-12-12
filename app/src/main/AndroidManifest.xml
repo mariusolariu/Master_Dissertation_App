@@ -17,7 +17,7 @@
         android:versionName="1">
 
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".view.MainActivity"
             android:theme="@style/NoBarTheme"
             android:launchMode="singleTop">
             <intent-filter>
@@ -30,27 +30,27 @@
         </activity>
 
         <activity
-            android:name=".ui.NewAppointmentActivity"
+            android:name=".view.NewAppointmentActivity"
             android:label="@string/new_appt_activ_name"
-            android:parentActivityName=".ui.MainActivity"
+            android:parentActivityName=".view.MainActivity"
             android:theme="@style/AppTheme" />
 
         <activity
-            android:name=".ui.ProvideFdbkActivity"
+            android:name=".view.ProvideFdbkActivity"
             android:label="@string/feedback_activ"
-            android:parentActivityName=".ui.MainActivity"
+            android:parentActivityName=".view.MainActivity"
             android:theme="@style/AppTheme" />
 
         <activity
-            android:name=".ui.SignUpActivity"
+            android:name=".view.SignInActivity"
             android:label="@string/title_activity_login"
             android:theme="@style/AppTheme" />
 
         <activity
-            android:name=".ui.ParticipantFdbkActivity"
+            android:name=".view.ParticipantFdbkActivity"
             android:label="Participant Feedback"
             android:theme="@style/AppTheme"
-            android:parentActivityName=".ui.MainActivity" />
+            android:parentActivityName=".view.MainActivity" />
 
     </application>
 

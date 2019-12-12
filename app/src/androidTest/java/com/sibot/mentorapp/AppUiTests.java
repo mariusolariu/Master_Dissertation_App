@@ -17,7 +17,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
 
-import com.sibot.mentorapp.ui.MainActivity;
+import com.sibot.mentorapp.view.MainActivity;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -65,22 +65,15 @@ public class AppUiTests {
 
 
     @Test
-    public void addAppointment() {
+    public void addApptTest() {
         onView(withId(R.id.newAppointmentFB)).perform(click());
-        onView(withId(R.id.mcodeET)).perform(typeText("newAppt"));
-        onView(withId(R.id.locationET)).perform(typeText(LOCATION_TEXT));
+
+        onView(withId(R.id.mcodeET)).perform(typeText("ment352"));
+        onView(withId(R.id.locationET)).perform(typeText("34 Test Road, TestTown"));
         onView(withId(R.id.locationET)).perform(closeSoftKeyboard());
-        onView(withId(R.id.start_time_p_id)).perform(setTime(startH, startM));
-        onView(withId(R.id.end_time_p_id)).perform(setTime(endH, endM));
-
-        //NOTE: The problem might be caused because the DatePickerFragment is added dynamically
-        //Fragment dialogFragment = new DatePickerFragment();
-        // newApptRule.getActivity().getFragmentManager().beginTransaction().add(R.id.containerNewApptId, dialogFragment).commit();
-        //onView(withId(R.id.pickDateET)).perform(scrollTo(),click()).perform(click());
-        //onView(withId(R.id.datePickerID)).perform(setDate(1994, 11, 10));
-
-        onView(withId(R.id.pickDateET)).perform(scrollTo(), setDate(apptY, apptM, apptD));
-
+        onView(withId(R.id.start_time_p_id)).perform(setTime(10, 30));
+        onView(withId(R.id.end_time_p_id)).perform(setTime(12, 30));
+        onView(withId(R.id.pickDateET)).perform(scrollTo(), setDate(2019, 8, 10));
 
         onView(withText(R.string.save_btn_text)).perform(scrollTo(), click());
 
@@ -90,52 +83,12 @@ public class AppUiTests {
         onView(withText("newAppt")).check(matches(isDisplayed()));
     }
 
-    @Ignore
-    @Test
-    /*
-     * Before running this make just the user is singed out!!
-     */
-    public void testSingIn() throws InterruptedException {
-        onView(withId(R.id.emailET)).perform(typeText("ymca.paisley.39@gmail.com"));
-        onView(withId(R.id.passwordET)).perform(typeText("parttime"));
-        onView(withId(R.id.loginB)).perform(click());
-
-        //check the user is signed in by looking that one of the appoinments tabs is present
-        Thread.sleep(2500);
-
-        //NOTE: doesn't work
-//        CountingIdlingResource singInResource = mainActivityRule.getActivity().getSingInResource();
-//        IdlingRegistry.getInstance().register(singInResource);
-//        registerIdlingResources(singInResource);
-//        singInResource.isIdleNow();
-        onView(withText(UPCOMING_TEXT)).check(matches(isDisplayed()));
-    }
-
-    @Test
-    @Ignore
-    /**
-     * Before running this test the user has to be singed in!
-     */
-    public void singOut() {
-        onView(withId(R.id.nav_drawer)).
-                perform(swipeRightLong());
-
-        onView(withText("Sign out")).perform(click());
-
-        onView(withId(R.id.loginB)).check(matches(isDisplayed()));
-
-    }
-
-    public static ViewAction swipeRightLong() {
-        return new GeneralSwipeAction(Swipe.SLOW, GeneralLocation.CENTER_LEFT, GeneralLocation.CENTER_RIGHT, Press.THUMB);
-    }
-
     //@Ignore
     /*
      * Add new appointment and then move it to the PAST appt by providing a reason for not completing it
      */
     @Test
-    public void cancelAppointment() {
+    public void cancelApptTest() {
         addTestAppointment();
 
         inputCancelReason(M_CODE_TEXT);
@@ -149,7 +102,7 @@ public class AppUiTests {
     /* Check that once the feedback has been provided for an appointment in UPCOMING the appointment is moved to PAST section
      */
     @Test
-    public void provideFeedbackAppt() {
+    public void provideFeedbackApptTest() {
         addTestAppointment();
 
         onView(withText(M_CODE_TEXT)).perform(click());
@@ -171,7 +124,7 @@ public class AppUiTests {
 
     //    @Ignore
     @Test
-    public void editTestAppt() {
+    public void editApptTest() {
         addTestAppointment();
 
         String newApptIdentifier = "newMCode";
@@ -225,6 +178,46 @@ public class AppUiTests {
         onView(withText(timeAndDate)).check(matches(isDisplayed()));
 
         inputCancelReason(newApptIdentifier);
+    }
+
+    @Ignore
+    @Test
+    /*
+     * Before running this make just the user is singed out!!
+     */
+    public void signInTest() throws InterruptedException {
+        onView(withId(R.id.emailET)).perform(typeText("ymca.paisley.39@gmail.com"));
+        onView(withId(R.id.passwordET)).perform(typeText("parttime"));
+        onView(withId(R.id.loginB)).perform(click());
+
+        //check the user is signed in by looking that one of the appoinments tabs is present
+        Thread.sleep(2500);
+
+        //NOTE: doesn't work
+//        CountingIdlingResource singInResource = mainActivityRule.getActivity().getSingInResource();
+//        IdlingRegistry.getInstance().register(singInResource);
+//        registerIdlingResources(singInResource);
+//        singInResource.isIdleNow();
+        onView(withText(UPCOMING_TEXT)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    @Ignore
+    /**
+     * Before running this test the user has to be singed in!
+     */
+    public void singOutTest() {
+        onView(withId(R.id.nav_drawer)).
+                perform(swipeRightLong());
+
+        onView(withText("Sign out")).perform(click());
+
+        onView(withId(R.id.loginB)).check(matches(isDisplayed()));
+
+    }
+
+    public static ViewAction swipeRightLong() {
+        return new GeneralSwipeAction(Swipe.SLOW, GeneralLocation.CENTER_LEFT, GeneralLocation.CENTER_RIGHT, Press.THUMB);
     }
 
     private void addTestAppointment() {

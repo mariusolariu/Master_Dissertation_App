@@ -1,4 +1,4 @@
-package com.sibot.mentorapp.ui;
+package com.sibot.mentorapp.view;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,7 +14,7 @@ import com.droidnet.DroidNet;
 import com.sibot.mentorapp.R;
 import com.sibot.mentorapp.util.EditTextHelper;
 
-public class SignUpActivity extends AppCompatActivity implements DroidListener {
+public class SignInActivity extends AppCompatActivity implements DroidListener {
     public static final String EMAIL_TAG = "email";
     public static final String PASS_TAG = "pass";
 

@@ -1,4 +1,4 @@
-package com.sibot.mentorapp.ui;
+package com.sibot.mentorapp.view;
 
 public enum AlertDialogType {
     REASON_AD(0), USER_NAME(1);

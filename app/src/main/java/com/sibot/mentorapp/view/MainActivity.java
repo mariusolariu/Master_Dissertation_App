@@ -1,4 +1,4 @@
-package com.sibot.mentorapp.ui;
+package com.sibot.mentorapp.view;
 
 import android.Manifest;
 import android.arch.lifecycle.Observer;
@@ -47,7 +47,7 @@ import com.sibot.mentorapp.R;
 import com.sibot.mentorapp.model.Appointment;
 import com.sibot.mentorapp.model.ManagerInfo;
 import com.sibot.mentorapp.model.UserInfo;
-import com.sibot.mentorapp.model.ViewModelMA;
+import com.sibot.mentorapp.model_view.ViewModelMA;
 import com.sibot.mentorapp.util.AppointmentState;
 import com.sibot.mentorapp.util.EditTextHelper;
 import com.sibot.mentorapp.util.InternetDialogHelper;
@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private AlertDialog reasonAlertDialog;
     private AlertDialog usernameAlertDialog;
 
-    private ViewModelMA maModel;
+    private ViewModelMA viewModelMA;
     private List<Fragment> fragments;
 
     private boolean smsPermissionGranted;
@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DroidNet.init(this);
         DroidNet.getInstance().addInternetConnectivityListener(this);
 
-
+        /*finds out if the user is authentificated or not*/
         FirebaseApp.initializeApp(this);
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -133,12 +133,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser currentUser = firebaseAuth.getCurrentUser();
 
-                if ((currentUser != null) /*&& (currentUser.isEmailVerified())*/) {                    //user is signed in
-//                    Toast.makeText(MainActivity.this, "Successful sign in!", Toast.LENGTH_SHORT).show();
+                if (currentUser != null) {
                     String userId = currentUser.getUid();
                     setUpApp(userId);
                 } else {
-                    startActivityForResult(new Intent(MainActivity.this, SignUpActivity.class), REQ_SIGN_IN);
+                    startActivityForResult(new Intent(MainActivity.this, SignInActivity.class), REQ_SIGN_IN);
                 }
 
             }
@@ -149,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //needs to be initialized to handle correctly a configuration change
         try {
-            maModel = ViewModelProviders.of(this).get(ViewModelMA.class);
+            viewModelMA = ViewModelProviders.of(this).get(ViewModelMA.class);
         } catch (IllegalStateException e) {
             Toast.makeText(this, "Error initialising the model!", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
@@ -157,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void setUpApp(final String userId) {
-        maModel.init(userId);
+        viewModelMA.init(userId);
 
         addApptBtn = findViewById(R.id.newAppointmentFB);
 
@@ -195,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         userInfo = new UserInfo(userName, userEmail);
         managerInfo = new ManagerInfo("", "");
 
-        addModelChangedDataListeners();
+        subscribeToDataSources();
         addUI_Listeners();
         updateUserInfo();
         checkForSmsPermission();
@@ -324,15 +323,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case NEW_APPT_CODE:
                 if (resultCode == RESULT_OK) {
                     Appointment newAppt = data.getExtras().getParcelable(NewAppointmentActivity.NEW_APPOINTMENT_TAG);
-                    maModel.addAppointment(newAppt);
+                    viewModelMA.addAppointment(newAppt);
                 }
 
                 break;
 
             case REQ_SIGN_IN:
                 if (resultCode == RESULT_OK) {
-                    String email = data.getExtras().getString(SignUpActivity.EMAIL_TAG);
-                    String password = data.getExtras().getString(SignUpActivity.PASS_TAG);
+                    String email = data.getExtras().getString(SignInActivity.EMAIL_TAG);
+                    String password = data.getExtras().getString(SignInActivity.PASS_TAG);
 
                     if (loginPB == null) {
                         loginPB = findViewById(R.id.indeterminatePB);
@@ -345,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (!task.isSuccessful()) {
                                 Toast.makeText(MainActivity.this, "Failed to sign in!\n Please try again!", Toast.LENGTH_SHORT).show();
-                                startActivityForResult(new Intent(MainActivity.this, SignUpActivity.class), REQ_SIGN_IN);
+                                startActivityForResult(new Intent(MainActivity.this, SignInActivity.class), REQ_SIGN_IN);
                             } else {
                                 //Succesful login
                                 MainActivity.this.loginPB.setVisibility(View.GONE);
@@ -366,9 +365,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     Appointment possibleNewAppt = data.getExtras().getParcelable(NewAppointmentActivity.NEW_APPOINTMENT_TAG);
 
                     if (!possibleNewAppt.equals(selectedAppt)) {
-                        maModel.removeAppointmnet(selectedAppt, appointmentState);
+                        viewModelMA.removeAppointmnet(selectedAppt, appointmentState);
 
-                        maModel.addAppointment(possibleNewAppt);
+                        viewModelMA.addAppointment(possibleNewAppt);
                     }
 
                 }
@@ -383,7 +382,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case PROVID_FDBK_CODE:
                 if (resultCode == RESULT_OK) {
                     String[] answers = data.getExtras().getStringArray(ANSWERS_ARRAY_CODE);
-                    maModel.apptFeedbackProvided(selectedAppt, appointmentState, answers);
+                    viewModelMA.apptFeedbackProvided(selectedAppt, appointmentState, answers);
 
                 }
 
@@ -396,7 +395,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case PARTICIPANT_PROVID_FDBK_CODE:
                 if (resultCode == RESULT_OK) {
                     String participantMessage = data.getExtras().getString(PARTICIPANT_FEEDBACK);
-                    maModel.participantFdbkProvided(selectedAppt, participantMessage);
+                    viewModelMA.participantFdbkProvided(selectedAppt, participantMessage);
                 }
 
                 selectedAppt = null;
@@ -410,8 +409,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
-    private void addModelChangedDataListeners() {
-        maModel.getProgressAppts().observe(this, new Observer<List<Appointment>>() {
+    private void subscribeToDataSources() {
+        viewModelMA.getProgressAppts().observe(this, new Observer<List<Appointment>>() {
             @Override
             public void onChanged(@Nullable List<Appointment> appointments) {
                 //send the new list to the active fragment
@@ -425,7 +424,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        maModel.getUpcomingAppts().observe(this, new Observer<List<Appointment>>() {
+        viewModelMA.getUpcomingAppts().observe(this, new Observer<List<Appointment>>() {
             @Override
             public void onChanged(@Nullable List<Appointment> appointments) {
 
@@ -438,7 +437,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        maModel.getFeedbackAppts().observe(this, new Observer<List<Appointment>>() {
+        viewModelMA.getFeedbackAppts().observe(this, new Observer<List<Appointment>>() {
             @Override
             public void onChanged(@Nullable List<Appointment> appointments) {
 
@@ -451,7 +450,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        maModel.getPastAppts().observe(this, new Observer<List<Appointment>>() {
+        viewModelMA.getPastAppts().observe(this, new Observer<List<Appointment>>() {
             @Override
             public void onChanged(@Nullable List<Appointment> appointments) {
 
@@ -464,7 +463,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        maModel.getUserInfoLD().observe(this, new Observer<UserInfo>() {
+        viewModelMA.getUserInfoLD().observe(this, new Observer<UserInfo>() {
             @Override
             public void onChanged(@Nullable final UserInfo userInfo) {
                 if (userInfo.user_name == null) { // first login for the user, ask for his name
@@ -483,7 +482,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 return;
                             }
 
-                            maModel.saveNewUserName(textValue);
+                            viewModelMA.saveNewUserName(textValue);
                             MainActivity.this.userInfo = userInfo;
                             updateUserInfo();
 
@@ -500,14 +499,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        maModel.getManagerInfoLD().observe(this, new Observer<ManagerInfo>() {
+        viewModelMA.getManagerInfoLD().observe(this, new Observer<ManagerInfo>() {
             @Override
             public void onChanged(@Nullable ManagerInfo managerInfo) {
                 MainActivity.this.managerInfo = managerInfo;
             }
         });
 
-        maModel.getFdbkQuestionsLD().observe(this, new Observer<List<String>>() {
+        viewModelMA.getFdbkQuestionsLD().observe(this, new Observer<List<String>>() {
             @Override
             public void onChanged(@Nullable List<String> fdbkQuestions) {
                 MainActivity.this.fdbkQuestions = fdbkQuestions;
@@ -576,7 +575,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 return;
                             }
 
-                            maModel.createNotFinishedAppt(selectedAppt, appointmentState, textValue);
+                            viewModelMA.createNotFinishedAppt(selectedAppt, appointmentState, textValue);
                             selectedAppt = null;
                             appointmentState = null;
                             invalidateOptionsMenu();
@@ -656,7 +655,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     if (!TextUtils.isEmpty(managerInfo.m_phone_no)) {
                         SmsManager smsManager = SmsManager.getDefault();
-                        String message = "Hi,\nI'm " + userInfo.user_name + " and I have a problem with my volunteering session!";
+                        String message = "Hi,\nI'm " + userInfo.user_name + " and I have a problem with my appointment!";
                         smsManager.sendTextMessage(managerInfo.m_phone_no, null, message, null, null);
                         Toast.makeText(this, "Message was sent!", Toast.LENGTH_SHORT).show();
                     } else {
@@ -757,19 +756,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         switch (fragmentType) {
             case PROGRESS:
-                appointments = maModel.getProgressApptsList();
+                appointments = viewModelMA.getProgressApptsList();
                 break;
 
             case UPCOMING:
-                appointments = maModel.getUpcomingApptsList();
+                appointments = viewModelMA.getUpcomingApptsList();
                 break;
 
             case FEEDBACK:
-                appointments = maModel.getFeedbackApptsList();
+                appointments = viewModelMA.getFeedbackApptsList();
                 break;
 
             case PAST:
-                appointments = maModel.getPastApptsList();
+                appointments = viewModelMA.getPastApptsList();
                 break;
 
             default:

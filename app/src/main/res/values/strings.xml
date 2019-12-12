@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PlusOne Mentor App</string>
+    <string name="app_name">SibotBooking</string>
     <string name="Open">Open navigation Drawer</string>
     <string name="Close">Close navigation drawer</string>
     <string name="sign_out_message">Sign out</string>

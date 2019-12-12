@@ -1,8 +1,4 @@
-package com.sibot.mentorapp.firebase;
-
-import com.sibot.mentorapp.model.Appointment;
-import com.sibot.mentorapp.model.ManagerInfo;
-import com.sibot.mentorapp.model.UserInfo;
+package com.sibot.mentorapp.model;
 
 import java.util.List;
 

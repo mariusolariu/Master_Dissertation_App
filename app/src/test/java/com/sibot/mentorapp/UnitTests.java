@@ -2,8 +2,8 @@ package com.sibot.mentorapp;
 
 import android.content.Intent;
 
-import com.sibot.mentorapp.ui.MainActivity;
-import com.sibot.mentorapp.ui.SignUpActivity;
+import com.sibot.mentorapp.view.MainActivity;
+import com.sibot.mentorapp.view.SignInActivity;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class UnitTests {
         activity.findViewById(R.id.newAppointmentFB).performClick();
         ShadowActivity mainActivShadow = shadowOf(activity);
 
-//        Intent startInt = new Intent(activity, SignUpActivity.class);
+//        Intent startInt = new Intent(activity, SignInActivity.class);
 //        Intent resultInt = new Intent();
 //        resultInt.putExtra("email", "ymca.paisley.39@gmail.com");
 //        resultInt.putExtra("email", "parttime");
@@ -45,7 +45,7 @@ public class UnitTests {
         Intent startedIntent = mainActivShadow.getNextStartedActivity();
 
         String actual = startedIntent.getComponent().getClassName();
-        String expected = SignUpActivity.class.getName();
+        String expected = SignInActivity.class.getName();
         assertThat(actual, equalTo(expected));
     }
 
