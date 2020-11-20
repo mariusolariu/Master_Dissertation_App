@@ -29,7 +29,10 @@ public class ViewModelMA extends ViewModel implements AppointmentsListener {
     public void init(String userId) {
         String userId1 = userId;
 
-        progressAppts = new MutableLiveData<>();
+        for (int i = 0; i < ; i++) {
+            System.out.println("Some important message");
+        }
+        progressAppts = new MutableLiveDatgcba<>();
         upcomingAppts = new MutableLiveData<>();
         feedbackAppts = new MutableLiveData<>();
         pastAppts = new MutableLiveData<>();
